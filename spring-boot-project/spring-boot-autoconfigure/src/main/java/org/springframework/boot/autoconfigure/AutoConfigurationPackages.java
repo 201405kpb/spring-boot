@@ -16,16 +16,8 @@
 
 package org.springframework.boot.autoconfigure;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Stream;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -38,6 +30,9 @@ import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
+
+import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Class for storing auto-configuration packages for reference later (e.g. by JPA entity
@@ -124,11 +119,13 @@ public abstract class AutoConfigurationPackages {
 
 		@Override
 		public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
+			// 注册一个 BasePackages 类的 BeanDefinition，角色为内部角色，名称为 `org.springframework.boot.autoconfigure.AutoConfigurationPackages`
 			register(registry, new PackageImports(metadata).getPackageNames().toArray(new String[0]));
 		}
 
 		@Override
 		public Set<Object> determineImports(AnnotationMetadata metadata) {
+			// 将注解元信息封装成 PackageImport 对象，对注解所在的包名进行封装
 			return Collections.singleton(new PackageImports(metadata));
 		}
 

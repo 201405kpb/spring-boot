@@ -16,25 +16,16 @@
 
 package org.springframework.boot.autoconfigure;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.context.TypeExcludeFilter;
-import org.springframework.context.annotation.AnnotationBeanNameGenerator;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.*;
 import org.springframework.context.annotation.ComponentScan.Filter;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.core.annotation.AliasFor;
 import org.springframework.data.repository.Repository;
+
+import java.lang.annotation.*;
 
 /**
  * Indicates a {@link Configuration configuration} class that declares one or more
@@ -51,23 +42,28 @@ import org.springframework.data.repository.Repository;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Inherited
-@SpringBootConfiguration
-@EnableAutoConfiguration
-@ComponentScan(excludeFilters = { @Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class),
-		@Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class) })
+@Inherited // 表明该注解定义在某个类上时，其子类会继承该注解
+@SpringBootConfiguration // 继承 `@Configuration` 注解
+@EnableAutoConfiguration // 开启自动配置功能
+@ComponentScan(
+		// 默认没有 TypeExcludeFilter
+		excludeFilters = {@Filter(type = FilterType.CUSTOM, classes = TypeExcludeFilter.class),
+				// 排除掉自动配置类
+				@Filter(type = FilterType.CUSTOM, classes = AutoConfigurationExcludeFilter.class)})
 public @interface SpringBootApplication {
 
 	/**
 	 * Exclude specific auto-configuration classes such that they will never be applied.
+	 * 需要自动配置的 Class 类
+	 *
 	 * @return the classes to exclude
 	 */
 	@AliasFor(annotation = EnableAutoConfiguration.class)
 	Class<?>[] exclude() default {};
 
 	/**
-	 * Exclude specific auto-configuration class names such that they will never be
-	 * applied.
+	 * Exclude specific auto-configuration class names such that they will never be applied.
+	 * 需要自动配置的类名称
 	 * @return the class names to exclude
 	 * @since 1.3.0
 	 */
@@ -77,6 +73,8 @@ public @interface SpringBootApplication {
 	/**
 	 * Base packages to scan for annotated components. Use {@link #scanBasePackageClasses}
 	 * for a type-safe alternative to String-based package names.
+	 *
+	 * 需要扫描的路径
 	 * <p>
 	 * <strong>Note:</strong> this setting is an alias for
 	 * {@link ComponentScan @ComponentScan} only. It has no effect on {@code @Entity}
@@ -92,6 +90,8 @@ public @interface SpringBootApplication {
 	/**
 	 * Type-safe alternative to {@link #scanBasePackages} for specifying the packages to
 	 * scan for annotated components. The package of each class specified will be scanned.
+	 *
+	 * 需要扫描的 Class 类
 	 * <p>
 	 * Consider creating a special no-op marker class or interface in each package that
 	 * serves no purpose other than being referenced by this attribute.
@@ -110,6 +110,7 @@ public @interface SpringBootApplication {
 	/**
 	 * The {@link BeanNameGenerator} class to be used for naming detected components
 	 * within the Spring container.
+	 *  Bean 名称生成器
 	 * <p>
 	 * The default value of the {@link BeanNameGenerator} interface itself indicates that
 	 * the scanner used to process this {@code @SpringBootApplication} annotation should
@@ -124,6 +125,8 @@ public @interface SpringBootApplication {
 	Class<? extends BeanNameGenerator> nameGenerator() default BeanNameGenerator.class;
 
 	/**
+	 * 被标记的 Bean 是否进行 CGLIB 提升
+	 *
 	 * Specify whether {@link Bean @Bean} methods should get proxied in order to enforce
 	 * bean lifecycle behavior, e.g. to return shared singleton bean instances even in
 	 * case of direct {@code @Bean} method calls in user code. This feature requires
