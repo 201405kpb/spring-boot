@@ -16,18 +16,16 @@
 
 package org.springframework.boot.autoconfigure.condition;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.boot.system.JavaVersion;
 import org.springframework.context.annotation.Conditional;
+
+import java.lang.annotation.*;
 
 /**
  * {@link Conditional @Conditional} that matches based on the JVM version the application
  * is running on.
+ *
+ * 系统的java版本是否符合要求
  *
  * @author Oliver Gierke
  * @author Phillip Webb

@@ -61,8 +61,8 @@ import org.springframework.context.annotation.Configuration;
 class ServletWebServerFactoryConfiguration {
 
 	@Configuration(proxyBeanMethods = false)
-	@ConditionalOnClass({ Servlet.class, Tomcat.class, UpgradeProtocol.class })
-	@ConditionalOnMissingBean(value = ServletWebServerFactory.class, search = SearchStrategy.CURRENT)
+	@ConditionalOnClass({ Servlet.class, Tomcat.class, UpgradeProtocol.class }) //判断当前是否引入了Tomcat依赖;
+	@ConditionalOnMissingBean(value = ServletWebServerFactory.class, search = SearchStrategy.CURRENT) //判断当前容器没有用户自己定义EmbeddedServletContainerFactory: 嵌入式的Servlet容器工厂; 作用: 创建嵌入式的Servlet容器
 	static class EmbeddedTomcat {
 
 		@Bean
