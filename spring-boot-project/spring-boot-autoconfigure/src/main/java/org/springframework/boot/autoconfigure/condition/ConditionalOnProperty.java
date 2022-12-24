@@ -16,20 +16,17 @@
 
 package org.springframework.boot.autoconfigure.condition;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.context.annotation.Conditional;
 import org.springframework.core.env.Environment;
+
+import java.lang.annotation.*;
 
 /**
  * {@link Conditional @Conditional} that checks if the specified properties have a
  * specific value. By default the properties must be present in the {@link Environment}
  * and <strong>not</strong> equal to {@code false}. The {@link #havingValue()} and
  * {@link #matchIfMissing()} attributes allow further customizations.
+ * 系统中指定的属性是否有指定的值
  * <p>
  * The {@link #havingValue} attribute can be used to specify the value that the property
  * should have. The table below shows when a condition matches according to the property

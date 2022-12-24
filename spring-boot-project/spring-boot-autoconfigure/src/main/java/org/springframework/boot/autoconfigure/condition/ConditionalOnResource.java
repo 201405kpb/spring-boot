@@ -16,17 +16,15 @@
 
 package org.springframework.boot.autoconfigure.condition;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.context.annotation.Conditional;
+
+import java.lang.annotation.*;
 
 /**
  * {@link Conditional @Conditional} that only matches when the specified resources are on
  * the classpath.
+ *
+ * 类路径下是否存在指定资源文件
  *
  * @author Dave Syer
  * @since 1.0.0
