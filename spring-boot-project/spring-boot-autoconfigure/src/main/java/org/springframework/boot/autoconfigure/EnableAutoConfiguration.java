@@ -16,13 +16,6 @@
 
 package org.springframework.boot.autoconfigure;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -32,6 +25,8 @@ import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+
+import java.lang.annotation.*;
 
 /**
  * Enable auto-configuration of the Spring Application Context, attempting to guess and
@@ -78,25 +73,27 @@ import org.springframework.context.annotation.Import;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@AutoConfigurationPackage
-@Import(AutoConfigurationImportSelector.class)
+@AutoConfigurationPackage // 注册一个 Bean 保存当前注解标注的类所在包路径
+@Import(AutoConfigurationImportSelector.class) // Spring Boot 自动配置的实现
 public @interface EnableAutoConfiguration {
 
 	/**
-	 * Environment property that can be used to override when auto-configuration is
-	 * enabled.
+	 * Environment property that can be used to override when auto-configuration is enabled.
+	 * <p>
+	 * 可通过这个配置关闭 Spring Boot 的自动配置功能
 	 */
 	String ENABLED_OVERRIDE_PROPERTY = "spring.boot.enableautoconfiguration";
 
 	/**
 	 * Exclude specific auto-configuration classes such that they will never be applied.
+	 * 指定需要排除的自动配置类的 Class 对象
 	 * @return the classes to exclude
 	 */
 	Class<?>[] exclude() default {};
 
 	/**
-	 * Exclude specific auto-configuration class names such that they will never be
-	 * applied.
+	 * Exclude specific auto-configuration class names such that they will never be applied.
+	 * 指定需要排除的自动配置类的名称
 	 * @return the class names to exclude
 	 * @since 1.3.0
 	 */
