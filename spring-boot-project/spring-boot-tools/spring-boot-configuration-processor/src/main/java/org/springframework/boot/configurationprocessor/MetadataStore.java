@@ -16,21 +16,15 @@
 
 package org.springframework.boot.configurationprocessor;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import org.springframework.boot.configurationprocessor.metadata.ConfigurationMetadata;
+import org.springframework.boot.configurationprocessor.metadata.InvalidConfigurationMetadataException;
+import org.springframework.boot.configurationprocessor.metadata.JsonMarshaller;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.tools.Diagnostic;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
-
-import org.springframework.boot.configurationprocessor.metadata.ConfigurationMetadata;
-import org.springframework.boot.configurationprocessor.metadata.InvalidConfigurationMetadataException;
-import org.springframework.boot.configurationprocessor.metadata.JsonMarshaller;
+import java.io.*;
 
 /**
  * A {@code MetadataStore} is responsible for the storage of metadata on the filesystem.
@@ -57,6 +51,8 @@ public class MetadataStore {
 
 	public ConfigurationMetadata readMetadata() {
 		try {
+			// 先获取 `META-INF/spring-configuration-metadata.json` 这个文件
+			// 通过 JsonMarshaller 将该文件数据读取至 ConfigurationMetadata 对象中
 			return readMetadata(getMetadataResource().openInputStream());
 		}
 		catch (IOException ex) {

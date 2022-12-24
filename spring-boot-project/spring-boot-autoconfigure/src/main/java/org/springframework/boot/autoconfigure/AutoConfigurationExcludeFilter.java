@@ -16,15 +16,15 @@
 
 package org.springframework.boot.autoconfigure;
 
-import java.io.IOException;
-import java.util.List;
-
 import org.springframework.beans.factory.BeanClassLoaderAware;
 import org.springframework.boot.context.annotation.ImportCandidates;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.core.type.filter.TypeFilter;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * A {@link TypeFilter} implementation that matches registered auto-configuration classes.
@@ -47,6 +47,7 @@ public class AutoConfigurationExcludeFilter implements TypeFilter, BeanClassLoad
 	@Override
 	public boolean match(MetadataReader metadataReader, MetadataReaderFactory metadataReaderFactory)
 			throws IOException {
+		// 如果有 `@Configuration` 注解，且是 `META-INF/spring.factories` 文件中 `@EnableAutoConfiguration` 注解对应的值 也就是一个自动配置类
 		return isConfiguration(metadataReader) && isAutoConfiguration(metadataReader);
 	}
 

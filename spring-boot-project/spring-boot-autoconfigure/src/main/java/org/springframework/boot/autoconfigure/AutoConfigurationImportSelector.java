@@ -16,29 +16,10 @@
 
 package org.springframework.boot.autoconfigure;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.Aware;
-import org.springframework.beans.factory.BeanClassLoaderAware;
-import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.BeanFactoryAware;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.beans.factory.*;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.context.annotation.ImportCandidates;
 import org.springframework.boot.context.properties.bind.Binder;
@@ -58,6 +39,11 @@ import org.springframework.core.type.classreading.MetadataReaderFactory;
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
+
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * {@link DeferredImportSelector} to handle {@link EnableAutoConfiguration
@@ -84,22 +70,58 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 
 	private static final String PROPERTY_NAME_AUTOCONFIGURE_EXCLUDE = "spring.autoconfigure.exclude";
 
+	/**
+	 * 底层 IoC 容器
+	 */
 	private ConfigurableListableBeanFactory beanFactory;
 
+	/**
+	 * 应用环境
+	 */
 	private Environment environment;
 
+	/**
+	 * 类加载器
+	 */
 	private ClassLoader beanClassLoader;
 
+	/**
+	 * 资源加载器
+	 */
 	private ResourceLoader resourceLoader;
 
+	/**
+	 * 自动配置类过滤器
+	 */
 	private ConfigurationClassFilter configurationClassFilter;
 
+	/**
+	 * 返回需要注入的 Bean 的类名称，那么 Spring 后续就会根据条件加载这些的 Bean
+	 * 至于这个方法在哪被调用的，返回的类名称为什么会被加载到 IoC 容器中，
+	 * 可以参考(死磕Spring之IoC篇 - @Bean 等注解的实现原理)[https://www.cnblogs.com/lifullmoon/p/14461712.html]
+	 *
+	 * @param annotationMetadata 注解的元数据
+	 * @return Bean 的类名称
+	 */
 	@Override
 	public String[] selectImports(AnnotationMetadata annotationMetadata) {
+		// 如果通过 spring.boot.enableautoconfiguration 配置关闭了自动配置功能 则返回空值
 		if (!isEnabled(annotationMetadata)) {
 			return NO_IMPORTS;
 		}
+		/**
+		 * 解析 `META-INF/spring-autoconfigure-metadata.properties` 文件，生成一个 AutoConfigurationEntry 自动配置类元数据对象
+		 *
+		 * 说明：引入 `spring-boot-autoconfigure-processor` 工具模块依赖后，其中会通过 Java SPI 机制引入 {@link AutoConfigureAnnotationProcessor} 注解处理器在编译阶段进行相关处理
+		 * 其中 `spring-boot-autoconfigure` 模块会引入该工具模块（不具有传递性），那么 Spring Boot 在编译 `spring-boot-autoconfigure` 这个 `jar` 包的时候，
+		 * 在编译阶段会扫描到带有 `@ConditionalOnClass` 等注解的 `.class` 文件，也就是自动配置类，将自动配置类的信息保存至 `META-INF/spring-autoconfigure-metadata.properties` 文件中
+		 * 例如保存类 `自动配置类类名.注解简称` => `注解中的值(逗号分隔)` 和 `自动配置类类名` => `空字符串`
+		 *
+		 * 当然，你自己写的 Spring Boot Starter 中的自动配置模块也可以引入这个 Spring Boot 提供的插件
+		 */
 		AutoConfigurationEntry autoConfigurationEntry = getAutoConfigurationEntry(annotationMetadata);
+
+		//返回所有需要自动配置的类
 		return StringUtils.toStringArray(autoConfigurationEntry.getConfigurations());
 	}
 
@@ -122,14 +144,35 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 		if (!isEnabled(annotationMetadata)) {
 			return EMPTY_ENTRY;
 		}
+		// <1> 获取 `@EnableAutoConfiguration` 注解的配置信息
 		AnnotationAttributes attributes = getAttributes(annotationMetadata);
+		// <2> 从所有的 `META-INF/spring.factories` 文件中找到 `@EnableAutoConfiguration` 注解对应的类（需要自动配置的类）
 		List<String> configurations = getCandidateConfigurations(annotationMetadata, attributes);
+		// <3> 对所有的自动配置类进行去重
 		configurations = removeDuplicates(configurations);
+		// <4> 获取需要排除的自动配置类
+		// 可通过 `@EnableAutoConfiguration` 注解的 `exclude` 和 `excludeName` 配置
+		// 也可以通过 `spring.autoconfigure.exclude` 配置
 		Set<String> exclusions = getExclusions(annotationMetadata, attributes);
+		// <5> 处理 `exclusions` 中特殊的类名称，保证能够排除它
 		checkExcludedClasses(configurations, exclusions);
+		// <6> 从 `configurations` 中将 `exclusions` 需要排除的自动配置类移除
 		configurations.removeAll(exclusions);
+		/**
+		 * <7> 从 `META-INF/spring.factories` 找到所有的 {@link AutoConfigurationImportFilter} 对 `configurations` 进行过滤处理
+		 * 例如 Spring Boot 中配置了 {@link org.springframework.boot.autoconfigure.condition.OnClassCondition}
+		 * 在这里提前过滤掉一些不满足条件的自动配置类，在 Spring 注入 Bean 的时候也会判断哦~
+		 */
 		configurations = getConfigurationClassFilter().filter(configurations);
+		/**
+		 * <8> 从 `META-INF/spring.factories` 找到所有的 {@link AutoConfigurationImportListener} 事件监听器
+		 * 触发每个监听器去处理 {@link AutoConfigurationImportEvent} 事件，该事件中包含了 `configurations` 和 `exclusions`
+		 * Spring Boot 中配置了一个 {@link org.springframework.boot.autoconfigure.condition.ConditionEvaluationReportAutoConfigurationImportListener}
+		 * 目的就是将 `configurations` 和 `exclusions` 保存至 {@link AutoConfigurationImportEvent} 对象中，并注册到 IoC 容器中，名称为 `autoConfigurationReport`
+		 * 这样一来我们可以注入这个 Bean 获取到自动配置类信息
+		 */
 		fireAutoConfigurationImportEvents(configurations, exclusions);
+		// <9> 将所有的自动配置类封装成一个 AutoConfigurationEntry 对象，并返回
 		return new AutoConfigurationEntry(configurations, exclusions);
 	}
 
@@ -177,6 +220,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 	 * @return a list of candidate configurations
 	 */
 	protected List<String> getCandidateConfigurations(AnnotationMetadata metadata, AnnotationAttributes attributes) {
+		// 从所有的 `META-INF/spring.factories` 文件中找到 `@EnableAutoConfiguration` 注解对应的类（需要自动配置的类）
 		List<String> configurations = ImportCandidates.load(AutoConfiguration.class, getBeanClassLoader())
 				.getCandidates();
 		Assert.notEmpty(configurations,
