@@ -16,19 +16,16 @@
 
 package org.springframework.boot.autoconfigure.condition;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.annotation.Conditional;
+
+import java.lang.annotation.*;
 
 /**
  * {@link Conditional @Conditional} that only matches when a bean of the specified class
  * is already contained in the {@link BeanFactory} and a single candidate can be
  * determined.
+ * 容器中只有一个指定的Bean,或者这个Bean是首选Bean
  * <p>
  * The condition will also match if multiple matching bean instances are already contained
  * in the {@link BeanFactory} but a primary candidate has been defined; essentially, the

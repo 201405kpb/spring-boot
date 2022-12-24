@@ -16,19 +16,16 @@
 
 package org.springframework.boot.autoconfigure.condition;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.springframework.context.annotation.Conditional;
 
 import javax.naming.InitialContext;
-
-import org.springframework.context.annotation.Conditional;
+import java.lang.annotation.*;
 
 /**
  * {@link Conditional @Conditional} that matches based on the availability of a JNDI
  * {@link InitialContext} and the ability to lookup specific locations.
+ *
+ * JNDI存在指定项
  *
  * @author Phillip Webb
  * @since 1.2.0

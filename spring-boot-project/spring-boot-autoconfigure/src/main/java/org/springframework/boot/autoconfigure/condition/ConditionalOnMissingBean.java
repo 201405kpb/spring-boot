@@ -16,21 +16,17 @@
 
 package org.springframework.boot.autoconfigure.condition;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.annotation.Conditional;
+
+import java.lang.annotation.*;
 
 /**
  * {@link Conditional @Conditional} that only matches when no beans meeting the specified
  * requirements are already contained in the {@link BeanFactory}. None of the requirements
  * must be met for the condition to match and the requirements do not have to be met by
  * the same bean.
+ * 容器中不存在指定Bean;
  * <p>
  * When placed on a {@code @Bean} method, the bean class defaults to the return type of
  * the factory method:
