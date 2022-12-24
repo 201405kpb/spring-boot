@@ -16,22 +16,6 @@
 
 package org.springframework.boot.autoconfigureprocessor;
 
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.stream.Stream;
-
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.RoundEnvironment;
@@ -44,6 +28,12 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Annotation processor to store certain annotations from auto-configuration classes in a
@@ -54,18 +44,24 @@ import javax.tools.StandardLocation;
  * @author Moritz Halbritter
  * @since 1.5.0
  */
-@SupportedAnnotationTypes({ "org.springframework.boot.autoconfigure.condition.ConditionalOnClass",
+@SupportedAnnotationTypes({"org.springframework.boot.autoconfigure.condition.ConditionalOnClass",
 		"org.springframework.boot.autoconfigure.condition.ConditionalOnBean",
 		"org.springframework.boot.autoconfigure.condition.ConditionalOnSingleCandidate",
 		"org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication",
 		"org.springframework.boot.autoconfigure.AutoConfigureBefore",
 		"org.springframework.boot.autoconfigure.AutoConfigureAfter",
 		"org.springframework.boot.autoconfigure.AutoConfigureOrder",
-		"org.springframework.boot.autoconfigure.AutoConfiguration" })
+		"org.springframework.boot.autoconfigure.AutoConfiguration"})
 public class AutoConfigureAnnotationProcessor extends AbstractProcessor {
 
+	/**
+	 * 生成的文件
+	 */
 	protected static final String PROPERTIES_PATH = "META-INF/spring-autoconfigure-metadata.properties";
 
+	/**
+	 * 保存指定注解的简称和注解全称之间的对应关系（不可修改）
+	 */
 	private final Map<String, String> properties = new TreeMap<>();
 
 	private final List<PropertyGenerator> propertyGenerators;
@@ -112,17 +108,25 @@ public class AutoConfigureAnnotationProcessor extends AbstractProcessor {
 
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+		// 遍历上面的几个 `@Conditional` 注解和几个定义自动配置类顺序的注解，依次进行处理
 		for (PropertyGenerator generator : this.propertyGenerators) {
+			// 对支持的注解进行处理，也就是找到所有标注了该注解的类，然后解析出该注解的值，保存至 Properties
+			// 例如 `类名.注解简称` => `注解中的值(逗号分隔)` 和 `类名` => `空字符串`，将自动配置类的信息已经对应注解的信息都保存起来
+			// 避免你每次启动 Spring Boot 应用都要去解析自动配置类上面的注解，是引入 `spring-boot-autoconfigure` 后可以从 `META-INF/spring-autoconfigure-metadata.properties` 文件中直接获取
+			// 这么一想，Spring Boot 设计的太棒了，所以你自己写的 Spring Boot Starter 中的自动配置模块也可以引入这个 Spring Boot 提供的插件
 			process(roundEnv, generator);
 		}
+		//  如果处理完成
 		if (roundEnv.processingOver()) {
 			try {
+				// 将 Properties 写入 `META-INF/spring-autoconfigure-metadata.properties` 文件
 				writeProperties();
 			}
 			catch (Exception ex) {
 				throw new IllegalStateException("Failed to write metadata", ex);
 			}
 		}
+		// 返回false
 		return false;
 	}
 

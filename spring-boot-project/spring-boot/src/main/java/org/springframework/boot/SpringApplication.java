@@ -16,25 +16,8 @@
 
 package org.springframework.boot;
 
-import java.lang.StackWalker.StackFrame;
-import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Properties;
-import java.util.Set;
-import java.util.stream.Stream;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.aot.AotDetector;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -54,15 +37,12 @@ import org.springframework.boot.context.properties.source.ConfigurationPropertyS
 import org.springframework.boot.convert.ApplicationConversionService;
 import org.springframework.boot.web.reactive.context.AnnotationConfigReactiveWebServerApplicationContext;
 import org.springframework.boot.web.servlet.context.AnnotationConfigServletWebServerApplicationContext;
+import org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.annotation.AnnotatedBeanDefinitionReader;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.AnnotationConfigUtils;
-import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
-import org.springframework.context.annotation.ConfigurationClassPostProcessor;
+import org.springframework.context.annotation.*;
 import org.springframework.context.aot.AotApplicationContextInitializer;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
@@ -70,25 +50,20 @@ import org.springframework.core.GenericTypeResolver;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.core.annotation.Order;
-import org.springframework.core.env.CommandLinePropertySource;
-import org.springframework.core.env.CompositePropertySource;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.Environment;
-import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
-import org.springframework.core.env.SimpleCommandLinePropertySource;
+import org.springframework.core.env.*;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.SpringFactoriesLoader;
 import org.springframework.core.io.support.SpringFactoriesLoader.ArgumentResolver;
 import org.springframework.core.metrics.ApplicationStartup;
-import org.springframework.util.Assert;
-import org.springframework.util.ClassUtils;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.ReflectionUtils;
-import org.springframework.util.StringUtils;
+import org.springframework.util.*;
 import org.springframework.util.function.ThrowingSupplier;
+
+import java.lang.StackWalker.StackFrame;
+import java.time.Duration;
+import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * Class that can be used to bootstrap and launch a Spring application from a Java main
@@ -170,11 +145,13 @@ public class SpringApplication {
 
 	/**
 	 * Default banner location.
+	 * banner 默认位置
 	 */
 	public static final String BANNER_LOCATION_PROPERTY_VALUE = SpringApplicationBannerPrinter.DEFAULT_BANNER_LOCATION;
 
 	/**
 	 * Banner location property key.
+	 * Banner 位置标识
 	 */
 	public static final String BANNER_LOCATION_PROPERTY = SpringApplicationBannerPrinter.BANNER_LOCATION_PROPERTY;
 
@@ -186,50 +163,113 @@ public class SpringApplication {
 
 	private static final ThreadLocal<SpringApplicationHook> applicationHook = new ThreadLocal<>();
 
+	/**
+	 * 主 Bean（通常为我们的启动类，优先注册）
+	 */
 	private final Set<Class<?>> primarySources;
 
+	/**
+	 * 来源 Bean（优先注册）
+	 */
 	private Set<String> sources = new LinkedHashSet<>();
 
+	/**
+	 * 启动类
+	 */
 	private Class<?> mainApplicationClass;
 
+	/**
+	 * Banner 打印模式
+	 */
 	private Banner.Mode bannerMode = Banner.Mode.CONSOLE;
 
+	/**
+	 * 是否打印应用启动耗时日志
+	 */
 	private boolean logStartupInfo = true;
 
+	/**
+	 * 是否接收命令行中的参数
+	 */
 	private boolean addCommandLineProperties = true;
 
+	/**
+	 * 是否设置 ConversionService 类型转换器
+	 */
 	private boolean addConversionService = true;
 
+	/**
+	 * Banner 对象（用于输出横幅）
+	 */
 	private Banner banner;
 
+	/**
+	 * 资源加载对象
+	 */
 	private ResourceLoader resourceLoader;
 
+	/**
+	 * Bean 名称生成器
+	 */
 	private BeanNameGenerator beanNameGenerator;
 
+	/**
+	 * Spring 应用的环境对象
+	 */
 	private ConfigurableEnvironment environment;
 
+	/**
+	 * Web 应用的类型（Servlet、Reactive）
+	 */
 	private WebApplicationType webApplicationType;
 
 	private boolean headless = true;
 
+	/**
+	 * 是否注册钩子函数，用于 JVM 关闭时关闭 Spring 应用上下文
+	 */
 	private boolean registerShutdownHook = true;
 
+	/**
+	 * 保存 ApplicationContextInitializer 对象（主要是对 Spring 应用上下文做一些初始化工作）
+	 */
 	private List<ApplicationContextInitializer<?>> initializers;
 
+	/**
+	 * 保存 ApplicationListener 监听器（支持在整个 Spring Boot 的多个时间点进行扩展）
+	 */
 	private List<ApplicationListener<?>> listeners;
 
+	/**
+	 * 默认的配置项
+	 */
 	private Map<String, Object> defaultProperties;
 
 	private final List<BootstrapRegistryInitializer> bootstrapRegistryInitializers;
 
+	/**
+	 * 额外的 profile
+	 */
 	private Set<String> additionalProfiles = Collections.emptySet();
 
+	/**
+	 * 是否允许覆盖 BeanDefinition
+	 */
 	private boolean allowBeanDefinitionOverriding;
 
+	/**
+	 * 是否允许循环引用
+	 */
 	private boolean allowCircularReferences;
 
+	/**
+	 * 是否为自定义的 Environment 对象
+	 */
 	private boolean isCustomEnvironment = false;
 
+	/**
+	 * 是否支持延迟初始化（需要通过 {@link LazyInitializationExcludeFilter} 过滤）
+	 */
 	private boolean lazyInitialization = false;
 
 	private String environmentPrefix;
@@ -262,16 +302,34 @@ public class SpringApplication {
 	 * @see #run(Class, String[])
 	 * @see #setSources(Set)
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	public SpringApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
+		// <1> 设置资源加载器
 		this.resourceLoader = resourceLoader;
 		Assert.notNull(primarySources, "PrimarySources must not be null");
+		// <2> 设置主要的 Class 类对象，通常是我们的启动类
 		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));
+		// <3> 通过 `classpath` 判断是否存在相应的 Class 类对象，来决定当前 Web 应用的类型（REACTIVE、SERVLET、NONE），默认为 **SERVLET**
+		// 不同的类型后续创建的 Environment 类型不同
 		this.webApplicationType = WebApplicationType.deduceFromClasspath();
+		/**
+		 * <4> 初始化所有 `BootstrapRegistryInitializer` 类型的对象，并保存至 `bootstrapRegistryInitializers` 集合中
+		 * 通过类加载器从 `META-INF/spring.factories` 文件中获取 BootstrapRegistryInitializer 类型的类名称，并进行实例化
+		 */
 		this.bootstrapRegistryInitializers = new ArrayList<>(
 				getSpringFactoriesInstances(BootstrapRegistryInitializer.class));
+		/**
+		 * <5> 初始化所有 `ApplicationContextInitializer` 类型的对象，并保存至 `initializers` 集合中
+		 * 通过类加载器从 `META-INF/spring.factories` 文件中获取 ApplicationContextInitializer 类型的类名称，并进行实例化
+		 */
 		setInitializers((Collection) getSpringFactoriesInstances(ApplicationContextInitializer.class));
+		/**
+		 * <6> 初始化所有 `ApplicationListener` 类型的对象，并保存至 `listeners` 集合中
+		 * 通过类加载器从 `META-INF/spring.factories` 文件中获取 ApplicationListener 类型的类名称，并进行实例化
+		 * 例如有一个 {@link ConfigFileApplicationListener}
+		 */
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
+		// <7> 获取当前被调用的 `main` 方法所属的 Class 类对象，并设置（主要用于打印日志）
 		this.mainApplicationClass = deduceMainApplicationClass();
 	}
 
@@ -282,6 +340,7 @@ public class SpringApplication {
 	}
 
 	private Optional<Class<?>> findMainClass(Stream<StackFrame> stack) {
+		// 对调用栈进行遍历，找到 `main` 方法所在的 Class 类对象并返回
 		return stack.filter((frame) -> Objects.equals(frame.getMethodName(), "main"))
 			.findFirst()
 			.map(StackWalker.StackFrame::getDeclaringClass);
@@ -294,29 +353,52 @@ public class SpringApplication {
 	 * @return a running {@link ApplicationContext}
 	 */
 	public ConfigurableApplicationContext run(String... args) {
+		//<1>记录程序启动时间
 		long startTime = System.nanoTime();
+		//<2> 初始化启动上下文
 		DefaultBootstrapContext bootstrapContext = createBootstrapContext();
 		ConfigurableApplicationContext context = null;
+		// <3>设置 `java.awt.headless` 属性，和 AWT 相关，暂时忽略
 		configureHeadlessProperty();
+		// <4> 初始化所有 `SpringApplicationRunListener` 类型的对象，并全部封装到 `SpringApplicationRunListeners` 对象中
 		SpringApplicationRunListeners listeners = getRunListeners(args);
+		// <5> 启动所有的 `SpringApplicationRunListener` 监听器
+		// 例如 `EventPublishingRunListener` 会广播 ApplicationEvent 应用正在启动的事件，
+		// 它里面封装了所有的 `ApplicationListener` 对象，那么此时就可以通过它们做一些初始化工作，进行拓展
 		listeners.starting(bootstrapContext, this.mainApplicationClass);
 		try {
+			// <6> 创建一个应用参数对象，将 `main(String[] args)` 方法的 `args` 参数封装起来，便于后续使用
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(args);
+			// <7> 准备好当前应用 Environment 环境，这里会加载出所有的配置信息，包括 `application.yaml` 和外部的属性配置
 			ConfigurableEnvironment environment = prepareEnvironment(listeners, bootstrapContext, applicationArguments);
+			// <8> 打印 banner 内容
 			Banner printedBanner = printBanner(environment);
+			// <9> 对 `context`（Spring 上下文）进行实例化
+			// 例如 Servlet（默认）会创建一个 AnnotationConfigServletWebServerApplicationContext 实例对象
 			context = createApplicationContext();
 			context.setApplicationStartup(this.applicationStartup);
+			// <10> 对 Spring 应用上下文做一些初始化工作，例如执行 ApplicationContextInitializer#initialize(..) 方法
 			prepareContext(bootstrapContext, context, environment, listeners, applicationArguments, printedBanner);
+			/**
+			 * <11> 刷新 Spring 应用上下文，在这里会完成所有 Spring Bean 的初始化，同时会初始化好 Servlet 容器，例如 Tomcat
+			 * 这一步涉及到 Spring IoC 的所有内容，参考[死磕Spring之IoC篇 - Spring 应用上下文 ApplicationContext](https://www.cnblogs.com/lifullmoon/p/14453083.html)
+			 * 在 {@link ServletWebServerApplicationContext#onRefresh()} 方法中会创建一个 Servlet 容器（默认为 Tomcat），也就是当前 Spring Boot 应用所运行的 Web 环境
+			 */
 			refreshContext(context);
+			// <12> 完成刷新 Spring 应用上下文的后置操作，空实现，扩展点
 			afterRefresh(context, applicationArguments);
 			Duration timeTakenToStartup = Duration.ofNanos(System.nanoTime() - startTime);
+			// <13> 统计整个 Spring Boot 应用的启动耗时，并打印
 			if (this.logStartupInfo) {
 				new StartupInfoLogger(this.mainApplicationClass).logStarted(getApplicationLog(), timeTakenToStartup);
 			}
+			// <14> 对所有的 SpringApplicationRunListener 监听器进行广播，发布 ApplicationStartedEvent 应用已启动事件
 			listeners.started(context, timeTakenToStartup);
+			// <15> 回调 IoC 容器中所有 ApplicationRunner 和 CommandLineRunner 类型的启动器
 			callRunners(context, applicationArguments);
 		}
 		catch (Throwable ex) {
+			// 处理异常，同时会将异常发送至异常报告器
 			if (ex instanceof AbandonedRunException) {
 				throw ex;
 			}
@@ -324,12 +406,14 @@ public class SpringApplication {
 			throw new IllegalStateException(ex);
 		}
 		try {
+			// <16> 对所有的 SpringApplicationRunListener 监听器进行广播，发布 ApplicationReadyEvent 应用已就绪事件
 			if (context.isRunning()) {
 				Duration timeTakenToReady = Duration.ofNanos(System.nanoTime() - startTime);
 				listeners.ready(context, timeTakenToReady);
 			}
 		}
 		catch (Throwable ex) {
+			// 处理异常，同时会将异常发送异常报告器
 			if (ex instanceof AbandonedRunException) {
 				throw ex;
 			}
@@ -346,21 +430,33 @@ public class SpringApplication {
 	}
 
 	private ConfigurableEnvironment prepareEnvironment(SpringApplicationRunListeners listeners,
-			DefaultBootstrapContext bootstrapContext, ApplicationArguments applicationArguments) {
+													   DefaultBootstrapContext bootstrapContext, ApplicationArguments applicationArguments) {
 		// Create and configure the environment
+		// <1> 根据 Web 应用的类型创建一个 StandardEnvironment 对象 `environment`
 		ConfigurableEnvironment environment = getOrCreateEnvironment();
+		// <2> 为 `environment` 配置默认属性（如果有）并设置需要激活的 `profile`
 		configureEnvironment(environment, applicationArguments.getSourceArgs());
+		// <3> 将当前 `environment` 的 MutablePropertySources 封装成 SpringConfigurationPropertySources 添加到 MutablePropertySources 首部
 		ConfigurationPropertySources.attach(environment);
+		/**
+		 * <4> 对所有的 SpringApplicationRunListener 广播 ApplicationEvent 应用环境已准备好的事件，这一步比较复杂
+		 * 例如 Spring Cloud 的 BootstrapApplicationListener 监听到该事件会创建一个 ApplicationContext 作为当前 Spring 应用上下文的父容器，同时会读取 `bootstrap.yml` 文件的信息
+		 * {@link ConfigFileApplicationListener} 监听到该事件然后去解析 `application.yml` 等应用配置文件的配置信息
+		 */
 		listeners.environmentPrepared(bootstrapContext, environment);
 		DefaultPropertiesPropertySource.moveToEnd(environment);
 		Assert.state(!environment.containsProperty("spring.main.environment-prefix"),
 				"Environment prefix cannot be set via properties.");
+		// <5> 将 `environment` 绑定到当前 SpringApplication 上
 		bindToSpringApplication(environment);
+		// <6> 如果不是自定义的 Environment 则需要根据 Web 应用类型转换成对应 Environment 类型
 		if (!this.isCustomEnvironment) {
 			EnvironmentConverter environmentConverter = new EnvironmentConverter(getClassLoader());
 			environment = environmentConverter.convertEnvironmentIfNecessary(environment, deduceEnvironmentClass());
 		}
+		// <7> 再次进行上面第 `3` 步的处理过程，防止上面几步对上面的 PropertySources 有修改
 		ConfigurationPropertySources.attach(environment);
+		// <8> 返回准备好的 `environment`
 		return environment;
 	}
 
@@ -377,12 +473,17 @@ public class SpringApplication {
 	}
 
 	private void prepareContext(DefaultBootstrapContext bootstrapContext, ConfigurableApplicationContext context,
-			ConfigurableEnvironment environment, SpringApplicationRunListeners listeners,
-			ApplicationArguments applicationArguments, Banner printedBanner) {
+								ConfigurableEnvironment environment, SpringApplicationRunListeners listeners,
+								ApplicationArguments applicationArguments, Banner printedBanner) {
+		// <1> 为 Spring 应用上下文设置 Environment 环境
 		context.setEnvironment(environment);
+		// <2> 将一些工具 Bean 设置到 Spring 应用上下文中，供使用
 		postProcessApplicationContext(context);
 		addAotGeneratedInitializerIfNecessary(this.initializers);
+		// <3> 通知 ApplicationContextInitializer 对 Spring 应用上下文进行初始化工作
+		// 参考 SpringApplication 构造方法
 		applyInitializers(context);
+		// <4> 对所有 SpringApplicationRunListener 进行广播，发布 ApplicationContextInitializedEvent 初始化事件
 		listeners.contextPrepared(context);
 		bootstrapContext.close(context);
 		if (this.logStartupInfo) {
@@ -390,6 +491,7 @@ public class SpringApplication {
 			logStartupProfileInfo(context);
 		}
 		// Add boot specific singleton beans
+		// <5> 向应用上下文注册 `main(String[])` 方法的参数 Bean 和 Banner 对象
 		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
 		beanFactory.registerSingleton("springApplicationArguments", applicationArguments);
 		if (printedBanner != null) {
@@ -407,10 +509,14 @@ public class SpringApplication {
 		context.addBeanFactoryPostProcessor(new PropertySourceOrderingBeanFactoryPostProcessor(context));
 		if (!AotDetector.useGeneratedArtifacts()) {
 			// Load the sources
+			// <6> 获取 `primarySources`（例如你的启动类）和 `sources`（例如 Spring Cloud 中的 @BootstrapConfiguration）源对象
 			Set<Object> sources = getAllSources();
 			Assert.notEmpty(sources, "Sources must not be empty");
+			// <7> 将上面的源对象加载成 BeanDefinition 并注册
 			load(context, sources.toArray(new Object[0]));
 		}
+		// <8> 对所有的 SpringApplicationRunListener 广播 ApplicationPreparedEvent 应用已准备事件
+		// 会把 ApplicationListener 添加至 Spring 应用上下文中
 		listeners.contextLoaded(context);
 	}
 
@@ -781,27 +887,30 @@ public class SpringApplication {
 				if (listeners != null) {
 					listeners.failed(context, exception);
 				}
-			}
-			finally {
+			} finally {
 				reportFailure(getExceptionReporters(context), exception);
 				if (context != null) {
 					context.close();
 					shutdownHook.deregisterFailedApplicationContext(context);
 				}
 			}
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			logger.warn("Unable to close ApplicationContext", ex);
 		}
 		ReflectionUtils.rethrowRuntimeException(exception);
 	}
 
+	/**
+	 * 获取异常处理器
+	 *
+	 * @param context
+	 * @return
+	 */
 	private Collection<SpringBootExceptionReporter> getExceptionReporters(ConfigurableApplicationContext context) {
 		try {
 			ArgumentResolver argumentResolver = ArgumentResolver.of(ConfigurableApplicationContext.class, context);
 			return getSpringFactoriesInstances(SpringBootExceptionReporter.class, argumentResolver);
-		}
-		catch (Throwable ex) {
+		} catch (Throwable ex) {
 			return Collections.emptyList();
 		}
 	}

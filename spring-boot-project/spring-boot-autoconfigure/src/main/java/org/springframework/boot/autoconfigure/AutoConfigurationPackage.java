@@ -16,14 +16,9 @@
 
 package org.springframework.boot.autoconfigure;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.context.annotation.Import;
+
+import java.lang.annotation.*;
 
 /**
  * Registers packages with {@link AutoConfigurationPackages}. When no {@link #basePackages
@@ -31,13 +26,17 @@ import org.springframework.context.annotation.Import;
  * package of the annotated class is registered.
  *
  * @author Phillip Webb
- * @since 1.3.0
  * @see AutoConfigurationPackages
+ * @since 1.3.0
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
+/**
+ * 将当前注解所标注的类所在包名封装成一个 {@link org.springframework.boot.autoconfigure.AutoConfigurationPackages.BasePackages} 进行注册
+ * 例如 JPA 模块的会使用到这个对象（JPA entity scanner）
+ */
 @Import(AutoConfigurationPackages.Registrar.class)
 public @interface AutoConfigurationPackage {
 

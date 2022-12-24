@@ -16,40 +16,26 @@
 
 package org.springframework.boot.configurationprocessor;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
-
-import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.annotation.processing.Processor;
-import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.lang.model.SourceVersion;
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.util.ElementFilter;
-import javax.tools.Diagnostic.Kind;
-
 import org.springframework.boot.configurationprocessor.metadata.ConfigurationMetadata;
 import org.springframework.boot.configurationprocessor.metadata.InvalidConfigurationMetadataException;
 import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
 
+import javax.annotation.processing.*;
+import javax.lang.model.SourceVersion;
+import javax.lang.model.element.*;
+import javax.lang.model.type.TypeKind;
+import javax.lang.model.util.ElementFilter;
+import javax.tools.Diagnostic.Kind;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.time.Duration;
+import java.util.*;
+
 /**
+ * 你可理解为这个类会帮助你在编译阶段进行相关处理，解析 `@ConfigurationProperties` 注解标注的类
+ * 将这些类对应的一些配置项（key）的信息保存在 `META-INF/spring-configuration-metadata.json` 文件中，例如类型、默认值
+ * 来帮助你编写 `application.yml` 的时候会有相关提示
  * Annotation {@link Processor} that writes meta-data file for
  * {@code @ConfigurationProperties}.
  *
@@ -161,8 +147,12 @@ public class ConfigurationMetadataAnnotationProcessor extends AbstractProcessor 
 	@Override
 	public synchronized void init(ProcessingEnvironment env) {
 		super.init(env);
+		// 创建一个 MetadataStore 元数据存储对象
 		this.metadataStore = new MetadataStore(env);
+		// 读取 `META-INF/spring-configuration-metadata.json` 这个文件，保存在 ConfigurationMetadata 中
+		// 然后再封装到 MetadataCollector 对象中
 		this.metadataCollector = new MetadataCollector(env, this.metadataStore.readMetadata());
+		// 创建一个 MetadataGenerationEnvironment 对象
 		this.metadataEnv = new MetadataGenerationEnvironment(env, configurationPropertiesAnnotation(),
 				nestedConfigurationPropertyAnnotation(), deprecatedConfigurationPropertyAnnotation(),
 				constructorBindingAnnotation(), autowiredAnnotation(), defaultValueAnnotation(), endpointAnnotations(),
@@ -172,23 +162,32 @@ public class ConfigurationMetadataAnnotationProcessor extends AbstractProcessor 
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
 		this.metadataCollector.processing(roundEnv);
+		// 获取 `@ConfigurationProperties` 注解
 		TypeElement annotationType = this.metadataEnv.getConfigurationPropertiesAnnotationElement();
+		// 如果存在该注解
 		if (annotationType != null) { // Is @ConfigurationProperties available
+			// 遍历带有 `@ConfigurationProperties` 注解的 Element 元素
 			for (Element element : roundEnv.getElementsAnnotatedWith(annotationType)) {
+				// 处理这个 Element 元素，根据注解解析出指定前缀的属性添加至 `metadataCollector` 中
 				processElement(element);
 			}
 		}
+		// 获取 `@Endpoint` 注解
 		Set<TypeElement> endpointTypes = this.metadataEnv.getEndpointAnnotationElements();
+		// 如果存在该注解
 		if (!endpointTypes.isEmpty()) { // Are endpoint annotations available
+			// 遍历所有带有 `@Endpoint` 注解的 Element 元素
 			for (TypeElement endpointType : endpointTypes) {
 				getElementsAnnotatedOrMetaAnnotatedWith(roundEnv, endpointType).forEach(this::processEndpoint);
 			}
 		}
+		// 如果处理完成
 		if (roundEnv.processingOver()) {
 			try {
+				// 先获取 `META-INF/additional-spring-configuration-metadata.json` 文件中的内容，合并到 ConfigurationMetadata 中
+				// 将 ConfigurationMetadata 写入 `META-INF/spring-configuration-metadata.json` 文件
 				writeMetadata();
-			}
-			catch (Exception ex) {
+			} catch (Exception ex) {
 				throw new IllegalStateException("Failed to write metadata", ex);
 			}
 		}
@@ -209,8 +208,10 @@ public class ConfigurationMetadataAnnotationProcessor extends AbstractProcessor 
 
 	private void processElement(Element element) {
 		try {
+			// 获取这个类上面的 `annotationName` 类型的注解信息 `@ConfigurationProperties` 注解信息
 			AnnotationMirror annotation = this.metadataEnv.getConfigurationPropertiesAnnotation(element);
 			if (annotation != null) {
+				// 获取注解指定的 `prefix` 属性前缀
 				String prefix = getPrefix(annotation);
 				if (element instanceof TypeElement typeElement) {
 					processAnnotatedTypeElement(prefix, typeElement, new Stack<>());
