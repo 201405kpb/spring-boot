@@ -18,7 +18,6 @@ package org.springframework.boot.web.servlet;
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.ServletContext;
-
 import org.springframework.util.Assert;
 
 /**
@@ -42,10 +41,12 @@ import org.springframework.util.Assert;
  */
 public class FilterRegistrationBean<T extends Filter> extends AbstractFilterRegistrationBean<T> {
 
+	//将要注册的Filter对象
 	private T filter;
 
 	/**
 	 * Create a new {@link FilterRegistrationBean} instance.
+	 * 创建一个FilterRegistrationBean实例对象
 	 */
 	public FilterRegistrationBean() {
 	}
@@ -53,6 +54,7 @@ public class FilterRegistrationBean<T extends Filter> extends AbstractFilterRegi
 	/**
 	 * Create a new {@link FilterRegistrationBean} instance to be registered with the
 	 * specified {@link ServletRegistrationBean}s.
+	 * 创建一个新的FilterRegistrationBean实例，使用指定的Filter和ServletRegistrationBean作为参数
 	 * @param filter the filter to register
 	 * @param servletRegistrationBeans associate {@link ServletRegistrationBean}s
 	 */
@@ -62,6 +64,7 @@ public class FilterRegistrationBean<T extends Filter> extends AbstractFilterRegi
 		this.filter = filter;
 	}
 
+	//获取将要注册的获取器
 	@Override
 	public T getFilter() {
 		return this.filter;
@@ -69,6 +72,7 @@ public class FilterRegistrationBean<T extends Filter> extends AbstractFilterRegi
 
 	/**
 	 * Set the filter to be registered.
+	 * 设置将要被注册的过滤器
 	 * @param filter the filter
 	 */
 	public void setFilter(T filter) {
