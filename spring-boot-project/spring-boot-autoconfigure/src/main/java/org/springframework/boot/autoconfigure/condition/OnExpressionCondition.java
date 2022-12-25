@@ -37,11 +37,13 @@ class OnExpressionCondition extends SpringBootCondition {
 
 	@Override
 	public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
+		// 获取标注上的表达式值
 		String expression = (String) metadata.getAnnotationAttributes(ConditionalOnExpression.class.getName())
 				.get("value");
 		expression = wrapIfNecessary(expression);
 		ConditionMessage.Builder messageBuilder = ConditionMessage.forCondition(ConditionalOnExpression.class,
 				"(" + expression + ")");
+		// 替换表达式中的值
 		expression = context.getEnvironment().resolvePlaceholders(expression);
 		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
 		if (beanFactory != null) {
@@ -63,6 +65,8 @@ class OnExpressionCondition extends SpringBootCondition {
 
 	/**
 	 * Allow user to provide bare expression with no '#{}' wrapper.
+	 * 允许用户提供没有“｛｝”包装的裸表达式。
+	 *
 	 * @param expression source expression
 	 * @return wrapped expression
 	 */
