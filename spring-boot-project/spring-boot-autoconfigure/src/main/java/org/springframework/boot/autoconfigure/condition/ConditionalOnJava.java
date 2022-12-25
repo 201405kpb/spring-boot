@@ -60,11 +60,13 @@ public @interface ConditionalOnJava {
 
 		/**
 		 * Equal to, or newer than the specified {@link JavaVersion}.
+		 * 等于或高于指定的 JavaVersion。
 		 */
 		EQUAL_OR_NEWER,
 
 		/**
 		 * Older than the specified {@link JavaVersion}.
+		 * 早于指定的 JavaVersion
 		 */
 		OLDER_THAN
 
