@@ -63,15 +63,18 @@ import org.springframework.web.filter.ForwardedHeaderFilter;
  */
 @AutoConfiguration
 @AutoConfigureOrder(Ordered.HIGHEST_PRECEDENCE)
-@ConditionalOnClass(ServletRequest.class)
-@ConditionalOnWebApplication(type = Type.SERVLET)
-@EnableConfigurationProperties(ServerProperties.class)
+@ConditionalOnClass(ServletRequest.class) //存在 ServletRequest 类
+@ConditionalOnWebApplication(type = Type.SERVLET)// WEB项目类型 为 SERVLET 类型
+@EnableConfigurationProperties(ServerProperties.class)// 引入 ServerProperties 配置项
+// 导入 内部类 BeanPostProcessorsRegistrar用于注册 BeanPostProcessor
+// 导入 ServletWebServerFactoryConfiguration 三个内部类用于判断WEB应用服务类型
 @Import({ ServletWebServerFactoryAutoConfiguration.BeanPostProcessorsRegistrar.class,
 		ServletWebServerFactoryConfiguration.EmbeddedTomcat.class,
 		ServletWebServerFactoryConfiguration.EmbeddedJetty.class,
 		ServletWebServerFactoryConfiguration.EmbeddedUndertow.class })
 public class ServletWebServerFactoryAutoConfiguration {
 
+	// 初始化 ServletWebServerFactoryCustomizer
 	@Bean
 	public ServletWebServerFactoryCustomizer servletWebServerFactoryCustomizer(ServerProperties serverProperties,
 			ObjectProvider<WebListenerRegistrar> webListenerRegistrars,
@@ -80,6 +83,7 @@ public class ServletWebServerFactoryAutoConfiguration {
 				cookieSameSiteSuppliers.orderedStream().toList());
 	}
 
+	// 初始化 TomcatServletWebServerFactoryCustomizer
 	@Bean
 	@ConditionalOnClass(name = "org.apache.catalina.startup.Tomcat")
 	public TomcatServletWebServerFactoryCustomizer tomcatServletWebServerFactoryCustomizer(
@@ -87,17 +91,20 @@ public class ServletWebServerFactoryAutoConfiguration {
 		return new TomcatServletWebServerFactoryCustomizer(serverProperties);
 	}
 
+
 	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnProperty(value = "server.forward-headers-strategy", havingValue = "framework")
 	@ConditionalOnMissingFilterBean(ForwardedHeaderFilter.class)
 	static class ForwardedHeaderFilterConfiguration {
 
+		//初始化 ForwardedHeaderFilterCustomizer
 		@Bean
 		@ConditionalOnClass(name = "org.apache.catalina.startup.Tomcat")
 		ForwardedHeaderFilterCustomizer tomcatForwardedHeaderFilterCustomizer(ServerProperties serverProperties) {
 			return (filter) -> filter.setRelativeRedirects(serverProperties.getTomcat().isUseRelativeRedirects());
 		}
 
+		// 实例化注册FilterRegistrationBean<ForwardedHeaderFilter>并设置其DispatcherType类型和优先级
 		@Bean
 		FilterRegistrationBean<ForwardedHeaderFilter> forwardedHeaderFilter(
 				ObjectProvider<ForwardedHeaderFilterCustomizer> customizerProvider) {
@@ -120,11 +127,13 @@ public class ServletWebServerFactoryAutoConfiguration {
 	/**
 	 * Registers a {@link WebServerFactoryCustomizerBeanPostProcessor}. Registered via
 	 * {@link ImportBeanDefinitionRegistrar} for early registration.
+	 * 通过 ImportBeanDefinitionRegistrar 注册一个 WebServerFactoryCustomizerBeanPostProcessor
 	 */
 	public static class BeanPostProcessorsRegistrar implements ImportBeanDefinitionRegistrar, BeanFactoryAware {
 
 		private ConfigurableListableBeanFactory beanFactory;
 
+		// 实现 BeanFactoryAware 的方法，设置 BeanFactory 属性
 		@Override
 		public void setBeanFactory(BeanFactory beanFactory) throws BeansException {
 			if (beanFactory instanceof ConfigurableListableBeanFactory listableBeanFactory) {
@@ -132,6 +141,7 @@ public class ServletWebServerFactoryAutoConfiguration {
 			}
 		}
 
+		// 注册WebServerFactoryCustomizerBeanPostProcessor 与ErrorPageRegistrarBeanPostProcessor
 		@Override
 		public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata,
 				BeanDefinitionRegistry registry) {
@@ -144,9 +154,10 @@ public class ServletWebServerFactoryAutoConfiguration {
 			registerSyntheticBeanIfMissing(registry, "errorPageRegistrarBeanPostProcessor",
 					ErrorPageRegistrarBeanPostProcessor.class, ErrorPageRegistrarBeanPostProcessor::new);
 		}
-
+		// 检查并注册Bean对象
 		private <T> void registerSyntheticBeanIfMissing(BeanDefinitionRegistry registry, String name,
 				Class<T> beanClass, Supplier<T> instanceSupplier) {
+			// 检查指定Bean 是否存在，如果不存在则创建Bean 对象并注册
 			if (ObjectUtils.isEmpty(this.beanFactory.getBeanNamesForType(beanClass, true, false))) {
 				RootBeanDefinition beanDefinition = new RootBeanDefinition(beanClass, instanceSupplier);
 				beanDefinition.setSynthetic(true);

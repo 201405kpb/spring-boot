@@ -16,12 +16,8 @@
 
 package org.springframework.boot.autoconfigure.security.servlet;
 
-import java.util.List;
-import java.util.regex.Pattern;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -39,6 +35,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.util.StringUtils;
+
+import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for a Spring Security in-memory
@@ -82,7 +81,9 @@ public class UserDetailsServiceAutoConfiguration {
 
 	private String getOrDeducePassword(SecurityProperties.User user, PasswordEncoder encoder) {
 		String password = user.getPassword();
+		// 用户密码是否未自动生成
 		if (user.isPasswordGenerated()) {
+			// 打印自动生成的用户密码
 			logger.warn(String.format(
 					"%n%nUsing generated security password: %s%n%nThis generated password is for development use only. "
 							+ "Your security configuration must be updated before running your application in "

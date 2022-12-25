@@ -16,17 +16,13 @@
 
 package org.springframework.boot.autoconfigure.security;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.web.servlet.DispatcherType;
 import org.springframework.boot.web.servlet.filter.OrderedFilter;
 import org.springframework.core.Ordered;
 import org.springframework.util.StringUtils;
+
+import java.util.*;
 
 /**
  * Configuration properties for Spring Security.
@@ -72,15 +68,20 @@ public class SecurityProperties {
 		return this.filter;
 	}
 
+	/**
+	 * 过滤器链
+	 */
 	public static class Filter {
 
 		/**
 		 * Security filter chain order.
+		 * Security 过滤器链顺序
 		 */
 		private int order = DEFAULT_FILTER_ORDER;
 
 		/**
 		 * Security filter chain dispatcher types.
+		 * Security 过滤器链分发类型
 		 */
 		private Set<DispatcherType> dispatcherTypes = EnumSet.allOf(DispatcherType.class);
 
@@ -106,16 +107,19 @@ public class SecurityProperties {
 
 		/**
 		 * Default user name.
+		 * 默认用户名
 		 */
 		private String name = "user";
 
 		/**
 		 * Password for the default user name.
+		 * 默认密码
 		 */
 		private String password = UUID.randomUUID().toString();
 
 		/**
 		 * Granted roles for the default user name.
+		 * 默认角色
 		 */
 		private List<String> roles = new ArrayList<>();
 
