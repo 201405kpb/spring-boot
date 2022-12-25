@@ -433,6 +433,12 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 
 	}
 
+	/**
+	 * 自动化配置类的加载顺序是先按照字母升序排列、再按照@AutoConfigureOrder指定的顺讯排序、
+	 * 最后按照@AutoConfigureAfter和@AutoConfigureBefore注解指定的相对顺序排列；
+	 * 另外这里面还涉及了自动化配置的原数据的读取问题，如果在原数据配置文件中配置了注解相关配置，
+	 * 则可以直接拿来用；否则需要通过元数据读取器工厂类获取元数据读取器，然后再获取注解属性值信息，效率相对较低
+	 */
 	private static class AutoConfigurationGroup
 			implements DeferredImportSelector.Group, BeanClassLoaderAware, BeanFactoryAware, ResourceLoaderAware {
 
@@ -500,8 +506,16 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 			return this.autoConfigurationMetadata;
 		}
 
+		/**
+		 * 自动化配置类排序
+		 *
+		 * @param configurations
+		 * @param autoConfigurationMetadata 自动化配置注解元数据对象，是PropertiesAutoConfigurationMetadata的实例对象
+		 * @return
+		 */
 		private List<String> sortAutoConfigurations(Set<String> configurations,
-				AutoConfigurationMetadata autoConfigurationMetadata) {
+													AutoConfigurationMetadata autoConfigurationMetadata) {
+			//此处调用实际排序的方法
 			return new AutoConfigurationSorter(getMetadataReaderFactory(), autoConfigurationMetadata)
 					.getInPriorityOrder(configurations);
 		}
@@ -510,8 +524,7 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 			try {
 				return this.beanFactory.getBean(SharedMetadataReaderFactoryContextInitializer.BEAN_NAME,
 						MetadataReaderFactory.class);
-			}
-			catch (NoSuchBeanDefinitionException ex) {
+			} catch (NoSuchBeanDefinitionException ex) {
 				return new CachingMetadataReaderFactory(this.resourceLoader);
 			}
 		}
