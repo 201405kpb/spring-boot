@@ -16,19 +16,21 @@
 
 package org.springframework.boot.autoconfigure.condition;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.springframework.boot.autoconfigure.condition.ConditionMessage.Builder;
 import org.springframework.boot.autoconfigure.condition.ConditionMessage.Style;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.io.Resource;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * {@link SpringBootCondition} used to check if a resource can be found using a
  * configurable property and optional default location(s).
+ * <p>
+ * 检查是否可以使用可配置属性和可选的默认位置找到资源
  *
  * @author Stephane Nicoll
  * @author Phillip Webb

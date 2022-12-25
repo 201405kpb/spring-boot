@@ -18,7 +18,6 @@ package org.springframework.boot.autoconfigure.condition;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
@@ -42,11 +41,16 @@ public abstract class SpringBootCondition implements Condition {
 
 	@Override
 	public final boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
+		// <1> 从注解元信息中获取所标注的`类名`（或者`类名#方法名`）
 		String classOrMethodName = getClassOrMethodName(metadata);
 		try {
+			// <2> 获取匹配结果（包含匹配消息），抽象方法，交由子类实现
 			ConditionOutcome outcome = getMatchOutcome(context, metadata);
+			// <3> 打印匹配日志
 			logOutcome(classOrMethodName, outcome);
+			// <4> 向 ConditionEvaluationReport 中记录本次的匹配结果
 			recordEvaluation(context, classOrMethodName, outcome);
+			// <5> 返回匹配结果
 			return outcome.isMatch();
 		}
 		catch (NoClassDefFoundError ex) {
@@ -108,7 +112,9 @@ public abstract class SpringBootCondition implements Condition {
 
 	/**
 	 * Determine the outcome of the match along with suitable log output.
-	 * @param context the condition context
+	 * 确定匹配结果以及适当的日志输出。
+	 *
+	 * @param context  the condition context
 	 * @param metadata the annotation metadata
 	 * @return the condition outcome
 	 */
@@ -116,6 +122,7 @@ public abstract class SpringBootCondition implements Condition {
 
 	/**
 	 * Return true if any of the specified conditions match.
+	 * 如果任何指定条件匹配，则返回true。
 	 * @param context the context
 	 * @param metadata the annotation meta-data
 	 * @param conditions conditions to test
@@ -133,6 +140,7 @@ public abstract class SpringBootCondition implements Condition {
 
 	/**
 	 * Return true if any of the specified condition matches.
+	 * 如果任何指定条件匹配，则返回true。
 	 * @param context the context
 	 * @param metadata the annotation meta-data
 	 * @param condition condition to test

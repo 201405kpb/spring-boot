@@ -16,10 +16,6 @@
 
 package org.springframework.boot.autoconfigure.condition;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import org.springframework.boot.autoconfigure.condition.ConditionMessage.Style;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
@@ -33,8 +29,13 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 /**
  * {@link Condition} that checks if properties are defined in environment.
+ * 检查是否在环境中定义了属性
  *
  * @author Maciej Walkowiak
  * @author Phillip Webb
@@ -47,38 +48,49 @@ class OnPropertyCondition extends SpringBootCondition {
 
 	@Override
 	public ConditionOutcome getMatchOutcome(ConditionContext context, AnnotatedTypeMetadata metadata) {
+		// 获取 `@ConditionalOnProperty` 注解的元数据 `allAnnotationAttributes` 集合
 		List<AnnotationAttributes> allAnnotationAttributes = metadata.getAnnotations()
 			.stream(ConditionalOnProperty.class.getName())
 			.filter(MergedAnnotationPredicates.unique(MergedAnnotation::getMetaTypes))
 			.map(MergedAnnotation::asAnnotationAttributes)
 			.toList();
+		// 存储匹配和不匹配的结果消息结果
 		List<ConditionMessage> noMatch = new ArrayList<>();
 		List<ConditionMessage> match = new ArrayList<>();
+		// 遍历 `allAnnotationAttributes`，依次匹配并保存结果
 		for (AnnotationAttributes annotationAttributes : allAnnotationAttributes) {
+			// 进行匹配，获取匹配结果
 			ConditionOutcome outcome = determineOutcome(annotationAttributes, context.getEnvironment());
 			(outcome.isMatch() ? match : noMatch).add(outcome.getConditionMessage());
 		}
+		// 如果存在不匹配的结果，则直接返回不匹配
 		if (!noMatch.isEmpty()) {
 			return ConditionOutcome.noMatch(ConditionMessage.of(noMatch));
 		}
+		// 返回匹配成功
 		return ConditionOutcome.match(ConditionMessage.of(match));
 	}
 
 	private ConditionOutcome determineOutcome(AnnotationAttributes annotationAttributes, PropertyResolver resolver) {
+		// 将注解元数据封装成 Spec 对象
 		Spec spec = new Spec(annotationAttributes);
 		List<String> missingProperties = new ArrayList<>();
 		List<String> nonMatchingProperties = new ArrayList<>();
+		// 收集不匹配和缺失的属性
 		spec.collectProperties(resolver, missingProperties, nonMatchingProperties);
+		// 如果有属性缺失，则直接返回不匹配
 		if (!missingProperties.isEmpty()) {
 			return ConditionOutcome.noMatch(ConditionMessage.forCondition(ConditionalOnProperty.class, spec)
 				.didNotFind("property", "properties")
 				.items(Style.QUOTE, missingProperties));
 		}
+		// 如果有不匹配的接口，则直接返回不匹配
 		if (!nonMatchingProperties.isEmpty()) {
 			return ConditionOutcome.noMatch(ConditionMessage.forCondition(ConditionalOnProperty.class, spec)
 				.found("different value in property", "different value in properties")
 				.items(Style.QUOTE, nonMatchingProperties));
 		}
+		// 返回匹配成果
 		return ConditionOutcome
 			.match(ConditionMessage.forCondition(ConditionalOnProperty.class, spec).because("matched"));
 	}
