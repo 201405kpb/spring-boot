@@ -71,6 +71,7 @@ public interface DispatcherServletPath {
 	/**
 	 * Return a URL mapping pattern that can be used with a
 	 * {@link ServletRegistrationBean} to map the dispatcher servlet.
+	 * 返回一个url 表达式，用于 ServletRegistrationBean映射对应的 DispatcherServlet
 	 * @return the path as a servlet URL mapping
 	 */
 	default String getServletUrlMapping() {

@@ -52,11 +52,19 @@ public class DispatcherServletRegistrationBean extends ServletRegistrationBean<D
 		return this.path;
 	}
 
+	/**
+	 *  重写该方法，但是抛出异常，相当于禁止该操作
+	 * @param urlMappings the mappings to set
+	 */
 	@Override
 	public void setUrlMappings(Collection<String> urlMappings) {
 		throw new UnsupportedOperationException("URL Mapping cannot be changed on a DispatcherServlet registration");
 	}
 
+	/**
+	 *  重写该方法，但是抛出异常，相当于禁止该操作
+	 * @param urlMappings the mappings to add
+	 */
 	@Override
 	public void addUrlMappings(String... urlMappings) {
 		throw new UnsupportedOperationException("URL Mapping cannot be changed on a DispatcherServlet registration");

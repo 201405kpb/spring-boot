@@ -38,9 +38,10 @@ import org.springframework.security.authentication.DefaultAuthenticationEventPub
  * @since 1.0.0
  */
 @AutoConfiguration
-@ConditionalOnClass(DefaultAuthenticationEventPublisher.class)
-@EnableConfigurationProperties(SecurityProperties.class)
-@Import({ SpringBootWebSecurityConfiguration.class, SecurityDataConfiguration.class })
+@ConditionalOnClass(DefaultAuthenticationEventPublisher.class) // 存在 DefaultAuthenticationEventPublisher 类对象
+@EnableConfigurationProperties(SecurityProperties.class) // 引入 SecurityProperties 配置项
+@Import({SpringBootWebSecurityConfiguration.class, SecurityDataConfiguration.class})
+// 导入 SpringBootWebSecurityConfiguration 和 SecurityDataConfiguration
 public class SecurityAutoConfiguration {
 
 	@Bean

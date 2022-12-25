@@ -16,32 +16,22 @@
 
 package org.springframework.boot.autoconfigure.jdbc;
 
-import javax.sql.DataSource;
-import javax.sql.XADataSource;
-
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
-import org.springframework.boot.autoconfigure.condition.ConditionMessage;
-import org.springframework.boot.autoconfigure.condition.ConditionOutcome;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.condition.SpringBootCondition;
+import org.springframework.boot.autoconfigure.condition.*;
 import org.springframework.boot.autoconfigure.jdbc.metadata.DataSourcePoolMetadataProvidersConfiguration;
 import org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
-import org.springframework.context.annotation.Condition;
-import org.springframework.context.annotation.ConditionContext;
-import org.springframework.context.annotation.Conditional;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.util.StringUtils;
+
+import javax.sql.DataSource;
+import javax.sql.XADataSource;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for {@link DataSource}.
@@ -53,9 +43,9 @@ import org.springframework.util.StringUtils;
  * @since 1.0.0
  */
 @AutoConfiguration(before = SqlInitializationAutoConfiguration.class)
-@ConditionalOnClass({ DataSource.class, EmbeddedDatabaseType.class })
+@ConditionalOnClass({DataSource.class, EmbeddedDatabaseType.class}) // 存在 DataSource 与 EmbeddedDatabaseType 类
 @ConditionalOnMissingBean(type = "io.r2dbc.spi.ConnectionFactory")
-@EnableConfigurationProperties(DataSourceProperties.class)
+@EnableConfigurationProperties(DataSourceProperties.class) // 导入 DataSourceProperties 配置类
 @Import(DataSourcePoolMetadataProvidersConfiguration.class)
 public class DataSourceAutoConfiguration {
 
