@@ -125,7 +125,8 @@ public @interface SpringBootApplication {
 	Class<? extends BeanNameGenerator> nameGenerator() default BeanNameGenerator.class;
 
 	/**
-	 * 被标记的 Bean 是否进行 CGLIB 提升
+	 * 被标记的 Bean 是否进行 CGLIB 提升，用来指定@Bean注解标注的方法是否使用代理，默认是true使用代理，直接从IOC容器之中取得对象；
+	 * 如果设置为false,也就是不适用注解，每次调用@Bean标注的方法获取到的对象和IOC容器中的都不一样，是一个新的对象
 	 *
 	 * Specify whether {@link Bean @Bean} methods should get proxied in order to enforce
 	 * bean lifecycle behavior, e.g. to return shared singleton bean instances even in

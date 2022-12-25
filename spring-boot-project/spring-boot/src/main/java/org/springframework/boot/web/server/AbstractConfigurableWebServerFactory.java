@@ -16,6 +16,8 @@
 
 package org.springframework.boot.web.server;
 
+import org.springframework.util.Assert;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -23,8 +25,6 @@ import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-import org.springframework.util.Assert;
 
 /**
  * Abstract base class for {@link ConfigurableWebServerFactory} implementations.
@@ -199,7 +199,9 @@ public abstract class AbstractConfigurableWebServerFactory implements Configurab
 	 */
 	protected final File createTempDir(String prefix) {
 		try {
+			// 创建一个临时目录，临时目录下的 `tomcat.端口号` 目录
 			File tempDir = Files.createTempDirectory(prefix + "." + getPort() + ".").toFile();
+			// 应用退出时会删除
 			tempDir.deleteOnExit();
 			return tempDir;
 		}

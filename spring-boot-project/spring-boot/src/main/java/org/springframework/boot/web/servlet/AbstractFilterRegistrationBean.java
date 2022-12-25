@@ -16,23 +16,17 @@
 
 package org.springframework.boot.web.servlet;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterRegistration;
 import jakarta.servlet.FilterRegistration.Dynamic;
 import jakarta.servlet.ServletContext;
-
 import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.util.*;
 
 /**
  * Abstract base {@link ServletContextInitializer} to register {@link Filter}s in a
@@ -45,6 +39,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
  */
 public abstract class AbstractFilterRegistrationBean<T extends Filter> extends DynamicRegistrationBean<Dynamic> {
 
+	//默认的URL映射路径
 	private static final String[] DEFAULT_URL_MAPPINGS = { "/*" };
 
 	private Set<ServletRegistrationBean<?>> servletRegistrationBeans = new LinkedHashSet<>();
@@ -60,6 +55,8 @@ public abstract class AbstractFilterRegistrationBean<T extends Filter> extends D
 	/**
 	 * Create a new instance to be registered with the specified
 	 * {@link ServletRegistrationBean}s.
+	 * 创建AbstractFilterRegistrationBean实例对象，参数为ServletRegistrationBean集合
+	 *
 	 * @param servletRegistrationBeans associate {@link ServletRegistrationBean}s
 	 */
 	AbstractFilterRegistrationBean(ServletRegistrationBean<?>... servletRegistrationBeans) {
@@ -69,6 +66,7 @@ public abstract class AbstractFilterRegistrationBean<T extends Filter> extends D
 
 	/**
 	 * Set {@link ServletRegistrationBean}s that the filter will be registered against.
+	 * 设置ServletRegistrationBean，过滤器将会针对其进行注册
 	 * @param servletRegistrationBeans the Servlet registration beans
 	 */
 	public void setServletRegistrationBeans(Collection<? extends ServletRegistrationBean<?>> servletRegistrationBeans) {
@@ -79,6 +77,7 @@ public abstract class AbstractFilterRegistrationBean<T extends Filter> extends D
 	/**
 	 * Return a mutable collection of the {@link ServletRegistrationBean} that the filter
 	 * will be registered against. {@link ServletRegistrationBean}s.
+	 *  返回Filter简要根据ServletRegistrationBean集合对象进行注册的ServletRegistrationBean集合
 	 * @return the Servlet registration beans
 	 * @see #setServletNames
 	 * @see #setUrlPatterns
@@ -89,6 +88,7 @@ public abstract class AbstractFilterRegistrationBean<T extends Filter> extends D
 
 	/**
 	 * Add {@link ServletRegistrationBean}s for the filter.
+	 * 添加ServletRegistrationBean对象
 	 * @param servletRegistrationBeans the servlet registration beans to add
 	 * @see #setServletRegistrationBeans
 	 */
@@ -100,6 +100,7 @@ public abstract class AbstractFilterRegistrationBean<T extends Filter> extends D
 	/**
 	 * Set servlet names that the filter will be registered against. This will replace any
 	 * previously specified servlet names.
+	 * 设置过滤器将注册的servlet名称，这将替换以前指定的任何servlet名称
 	 * @param servletNames the servlet names
 	 * @see #setServletRegistrationBeans
 	 * @see #setUrlPatterns
@@ -110,8 +111,8 @@ public abstract class AbstractFilterRegistrationBean<T extends Filter> extends D
 	}
 
 	/**
-	 * Return a mutable collection of servlet names that the filter will be registered
-	 * against.
+	 * Return a mutable collection of servlet names that the filter will be registered against.
+	 * 返回用于注册过滤器的servlet名称的可变集合
 	 * @return the servlet names
 	 */
 	public Collection<String> getServletNames() {
@@ -120,6 +121,7 @@ public abstract class AbstractFilterRegistrationBean<T extends Filter> extends D
 
 	/**
 	 * Add servlet names for the filter.
+	 * 为Filter添加servlet名称
 	 * @param servletNames the servlet names to add
 	 */
 	public void addServletNames(String... servletNames) {
@@ -130,6 +132,7 @@ public abstract class AbstractFilterRegistrationBean<T extends Filter> extends D
 	/**
 	 * Set the URL patterns that the filter will be registered against. This will replace
 	 * any previously specified URL patterns.
+	 * 设置将根据其注册Filter的URL模式，这将替换以前指定的任何URL模式
 	 * @param urlPatterns the URL patterns
 	 * @see #setServletRegistrationBeans
 	 * @see #setServletNames
@@ -142,6 +145,7 @@ public abstract class AbstractFilterRegistrationBean<T extends Filter> extends D
 	/**
 	 * Return a mutable collection of URL patterns, as defined in the Servlet
 	 * specification, that the filter will be registered against.
+	 * 返回一个URL模式的可变集合，如Servlet规范中定义的那样，过滤器针对这些模式进行注册
 	 * @return the URL patterns
 	 */
 	public Collection<String> getUrlPatterns() {
@@ -151,6 +155,7 @@ public abstract class AbstractFilterRegistrationBean<T extends Filter> extends D
 	/**
 	 * Add URL patterns, as defined in the Servlet specification, that the filter will be
 	 * registered against.
+	 * 添加URL模式，如Servlet规范中所定义的，过滤器将针对这些模式进行注册
 	 * @param urlPatterns the URL patterns
 	 */
 	public void addUrlPatterns(String... urlPatterns) {
@@ -204,6 +209,7 @@ public abstract class AbstractFilterRegistrationBean<T extends Filter> extends D
 		return "filter " + getOrDeduceName(filter);
 	}
 
+	//注册过滤器
 	@Override
 	protected Dynamic addRegistration(String description, ServletContext servletContext) {
 		Filter filter = getFilter();
@@ -213,6 +219,7 @@ public abstract class AbstractFilterRegistrationBean<T extends Filter> extends D
 	/**
 	 * Configure registration settings. Subclasses can override this method to perform
 	 * additional configuration if required.
+	 * 配置过滤器的配置
 	 * @param registration the registration
 	 */
 	@Override

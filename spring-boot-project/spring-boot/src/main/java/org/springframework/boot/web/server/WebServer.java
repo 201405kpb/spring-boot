@@ -20,6 +20,8 @@ package org.springframework.boot.web.server;
  * Simple interface that represents a fully configured web server (for example Tomcat,
  * Jetty, Netty). Allows the server to be {@link #start() started} and {@link #stop()
  * stopped}.
+ * <p>
+ * 表示完全配置的web服务器的简单接口（例如：Tomcat、Jetty、Netty）,允许服务器start和stop
  *
  * @author Phillip Webb
  * @author Dave Syer
@@ -28,21 +30,24 @@ package org.springframework.boot.web.server;
 public interface WebServer {
 
 	/**
-	 * Starts the web server. Calling this method on an already started server has no
-	 * effect.
+	 * Starts the web server. Calling this method on an already started server has no effect.
+	 *
+	 * 启动web server,在一个已经启动的服务器上调用此方法没有任何效果
+	 *
 	 * @throws WebServerException if the server cannot be started
 	 */
 	void start() throws WebServerException;
 
 	/**
-	 * Stops the web server. Calling this method on an already stopped server has no
-	 * effect.
+	 * Stops the web server. Calling this method on an already stopped server has no effect.
+	 * 停止web server,在一个已经停止的服务器上调用此方法没有任何效果
 	 * @throws WebServerException if the server cannot be stopped
 	 */
 	void stop() throws WebServerException;
 
 	/**
 	 * Return the port this server is listening on.
+	 * 返回当前服务器正在监听的端口，如果不存在，则返回-1
 	 * @return the port (or -1 if none)
 	 */
 	int getPort();
@@ -54,6 +59,10 @@ public interface WebServer {
 	 * implementation invokes the callback immediately with
 	 * {@link GracefulShutdownResult#IMMEDIATE}, i.e. no attempt is made at a graceful
 	 * shutdown.
+	 *
+	 * 优雅的关闭web服务器，停止接收新的请求，并在最后尝试调用callback的回调方法；
+	 * 也可以通过调用stop来停止，默认的实现时立马调用callback回调
+	 *
 	 * @param callback the callback to invoke when the graceful shutdown completes
 	 * @since 2.3.0
 	 */

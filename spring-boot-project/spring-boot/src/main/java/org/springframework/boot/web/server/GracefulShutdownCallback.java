@@ -28,6 +28,8 @@ public interface GracefulShutdownCallback {
 
 	/**
 	 * Graceful shutdown has completed with the given {@code result}.
+	 * 使用给定的结果优雅的关闭服务器
+	 *
 	 * @param result the result of the shutdown
 	 */
 	void shutdownComplete(GracefulShutdownResult result);
