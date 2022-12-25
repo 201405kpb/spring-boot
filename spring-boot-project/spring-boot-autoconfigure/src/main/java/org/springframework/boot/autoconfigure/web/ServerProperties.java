@@ -16,34 +16,26 @@
 
 package org.springframework.boot.autoconfigure.web;
 
+import io.undertow.UndertowOptions;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
+import org.springframework.boot.context.properties.NestedConfigurationProperty;
+import org.springframework.boot.convert.DurationUnit;
+import org.springframework.boot.web.server.Shutdown;
+import org.springframework.boot.web.server.*;
+import org.springframework.boot.web.servlet.server.Encoding;
+import org.springframework.boot.web.servlet.server.Jsp;
+import org.springframework.boot.web.servlet.server.Session;
+import org.springframework.util.StringUtils;
+import org.springframework.util.unit.DataSize;
+
 import java.io.File;
 import java.net.InetAddress;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import io.undertow.UndertowOptions;
-
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.DeprecatedConfigurationProperty;
-import org.springframework.boot.context.properties.NestedConfigurationProperty;
-import org.springframework.boot.convert.DurationUnit;
-import org.springframework.boot.web.server.Compression;
-import org.springframework.boot.web.server.Cookie;
-import org.springframework.boot.web.server.Http2;
-import org.springframework.boot.web.server.Shutdown;
-import org.springframework.boot.web.server.Ssl;
-import org.springframework.boot.web.servlet.server.Encoding;
-import org.springframework.boot.web.servlet.server.Jsp;
-import org.springframework.boot.web.servlet.server.Session;
-import org.springframework.util.StringUtils;
-import org.springframework.util.unit.DataSize;
+import java.util.*;
 
 /**
  * {@link ConfigurationProperties @ConfigurationProperties} for a web server (e.g. port
@@ -75,6 +67,10 @@ import org.springframework.util.unit.DataSize;
  */
 @ConfigurationProperties(prefix = "server", ignoreUnknownFields = true)
 public class ServerProperties {
+
+	public ServerProperties() {
+
+	}
 
 	/**
 	 * Server HTTP port.
