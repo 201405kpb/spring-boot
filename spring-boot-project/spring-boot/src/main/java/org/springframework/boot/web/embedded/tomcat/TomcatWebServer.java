@@ -16,34 +16,22 @@
 
 package org.springframework.boot.web.embedded.tomcat;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
-
-import javax.naming.NamingException;
-
-import org.apache.catalina.Container;
-import org.apache.catalina.Context;
-import org.apache.catalina.Engine;
-import org.apache.catalina.Lifecycle;
-import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleState;
-import org.apache.catalina.Service;
+import org.apache.catalina.*;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.naming.ContextBindings;
-
-import org.springframework.boot.web.server.GracefulShutdownCallback;
-import org.springframework.boot.web.server.GracefulShutdownResult;
-import org.springframework.boot.web.server.PortInUseException;
 import org.springframework.boot.web.server.Shutdown;
-import org.springframework.boot.web.server.WebServer;
-import org.springframework.boot.web.server.WebServerException;
+import org.springframework.boot.web.server.*;
 import org.springframework.util.Assert;
+
+import javax.naming.NamingException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * {@link WebServer} that can be used to control a Tomcat web server. Usually this class
@@ -101,6 +89,7 @@ public class TomcatWebServer implements WebServer {
 		this.tomcat = tomcat;
 		this.autoStart = autoStart;
 		this.gracefulShutdown = (shutdown == Shutdown.GRACEFUL) ? new GracefulShutdown(tomcat) : null;
+		/** 初始化 Tomcat 容器，并异步触发了 {@link TomcatStarter#onStartup} 方法 */
 		initialize();
 	}
 
@@ -109,7 +98,7 @@ public class TomcatWebServer implements WebServer {
 		synchronized (this.monitor) {
 			try {
 				addInstanceIdToEngineName();
-
+				// 找到之前创建的 TomcatEmbeddedContext 上下文
 				Context context = findContext();
 				context.addLifecycleListener((event) -> {
 					if (context.equals(event.getSource()) && Lifecycle.START_EVENT.equals(event.getType())) {
@@ -120,6 +109,7 @@ public class TomcatWebServer implements WebServer {
 				});
 
 				// Start the server to trigger initialization listeners
+				/** 启动 Tomcat 容器，这里会触发初始化监听器，例如异步触发了 {@link TomcatStarter#onStartup} 方法 */
 				this.tomcat.start();
 
 				// We can re-throw failure exception directly in the main thread
@@ -205,7 +195,9 @@ public class TomcatWebServer implements WebServer {
 
 	@Override
 	public void start() throws WebServerException {
+		// 加锁启动
 		synchronized (this.monitor) {
+			// 已启动则跳过
 			if (this.started) {
 				return;
 			}
@@ -213,6 +205,10 @@ public class TomcatWebServer implements WebServer {
 				addPreviouslyRemovedConnectors();
 				Connector connector = this.tomcat.getConnector();
 				if (connector != null && this.autoStart) {
+					/**
+					 * 对每一个 TomcatEmbeddedContext 中的 Servlet 进行加载并初始化，先找到容器中所有的 {@link org.apache.catalina.Wrapper}
+					 * 它是对 {@link javax.servlet.Servlet} 的封装，依次加载并初始化它们
+					 */
 					performDeferredLoadOnStartup();
 				}
 				checkThatConnectorsHaveStarted();
@@ -302,6 +298,10 @@ public class TomcatWebServer implements WebServer {
 		try {
 			for (Container child : this.tomcat.getHost().findChildren()) {
 				if (child instanceof TomcatEmbeddedContext embeddedContext) {
+					/**
+					 * 找到容器中所有的 {@link org.apache.catalina.Wrapper}，它是对 {@link javax.servlet.Servlet} 的封装
+					 * 那么这里将依次加载并初始化它们
+					 */
 					embeddedContext.deferredLoadOnStartup();
 				}
 			}
