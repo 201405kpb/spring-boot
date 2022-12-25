@@ -16,32 +16,20 @@
 
 package org.springframework.boot.context.properties.bind;
 
-import java.util.ArrayDeque;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Deque;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
 import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.context.properties.bind.Bindable.BindRestriction;
-import org.springframework.boot.context.properties.source.ConfigurationProperty;
-import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
-import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
-import org.springframework.boot.context.properties.source.ConfigurationPropertySources;
-import org.springframework.boot.context.properties.source.ConfigurationPropertyState;
+import org.springframework.boot.context.properties.source.*;
 import org.springframework.boot.convert.ApplicationConversionService;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.ConverterNotFoundException;
 import org.springframework.core.env.Environment;
 import org.springframework.format.support.DefaultFormattingConversionService;
 import org.springframework.util.Assert;
+
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * A container object which Binds objects from one or more
