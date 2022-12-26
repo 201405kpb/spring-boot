@@ -16,49 +16,51 @@
 
 package org.springframework.boot.context.properties.bind;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Supplier;
-
 import org.springframework.boot.context.properties.source.ConfigurationProperty;
 import org.springframework.core.ResolvableType;
 import org.springframework.core.style.ToStringCreator;
 import org.springframework.util.Assert;
 import org.springframework.util.ObjectUtils;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
+import java.util.*;
+import java.util.function.Supplier;
+
 /**
  * Source that can be bound by a {@link Binder}.
+ * Bindable是指可由Binder绑定的源（如：基本数据类型，java对象、List、数组等等），也可以理解为可以绑定到指定的属性配置的值
  *
  * @param <T> the source type
  * @author Phillip Webb
  * @author Madhura Bhave
- * @since 2.0.0
  * @see Bindable#of(Class)
  * @see Bindable#of(ResolvableType)
+ * @since 2.0.0
  */
 public final class Bindable<T> {
 
+	//默认注解空数组
 	private static final Annotation[] NO_ANNOTATIONS = {};
 
 	private static final EnumSet<BindRestriction> NO_BIND_RESTRICTIONS = EnumSet.noneOf(BindRestriction.class);
-
+	//要绑定项的类型
 	private final ResolvableType type;
 
+	//要绑定项的包装类型
 	private final ResolvableType boxedType;
 
+	//要绑定的数据值的提供者，是一个函数式接口
 	private final Supplier<T> value;
 
+	//可能影响绑定的任何关联注解
 	private final Annotation[] annotations;
 
 	private final EnumSet<BindRestriction> bindRestrictions;
 
+	//私有的构造函数，创建一个Bindable实例
 	private Bindable(ResolvableType type, ResolvableType boxedType, Supplier<T> value, Annotation[] annotations,
-			EnumSet<BindRestriction> bindRestrictions) {
+					 EnumSet<BindRestriction> bindRestrictions) {
 		this.type = type;
 		this.boxedType = boxedType;
 		this.value = value;
@@ -165,6 +167,8 @@ public final class Bindable<T> {
 
 	/**
 	 * Create an updated {@link Bindable} instance with the specified annotations.
+	 * 创建一个指定注解的更新Bindable实例对象
+	 *
 	 * @param annotations the annotations
 	 * @return an updated {@link Bindable}
 	 */
@@ -175,6 +179,7 @@ public final class Bindable<T> {
 
 	/**
 	 * Create an updated {@link Bindable} instance with an existing value.
+	 * 创建一个存在指定值的更新Bindable实例对象
 	 * @param existingValue the existing value
 	 * @return an updated {@link Bindable}
 	 */
@@ -188,6 +193,7 @@ public final class Bindable<T> {
 
 	/**
 	 * Create an updated {@link Bindable} instance with a value supplier.
+	 * 创建一个suppliedValue值提供者更新的Bindable实例对象
 	 * @param suppliedValue the supplier for the value
 	 * @return an updated {@link Bindable}
 	 */
@@ -197,6 +203,7 @@ public final class Bindable<T> {
 
 	/**
 	 * Create an updated {@link Bindable} instance with additional bind restrictions.
+	 * 创建具有附加绑定限制的更新的Bindable实例。
 	 * @param additionalRestrictions any additional restrictions to apply
 	 * @return an updated {@link Bindable}
 	 * @since 2.5.0
@@ -210,6 +217,7 @@ public final class Bindable<T> {
 	/**
 	 * Create a new {@link Bindable} of the type of the specified instance with an
 	 * existing value equal to the instance.
+	 * 创建一个指定值及数据类型和指定值数据类型相同的Bindable实例对象
 	 * @param <T> the source type
 	 * @param instance the instance (must not be {@code null})
 	 * @return a {@link Bindable} instance
@@ -225,6 +233,7 @@ public final class Bindable<T> {
 
 	/**
 	 * Create a new {@link Bindable} of the specified type.
+	 * 创建一个指定数据类型的Bindable实例对象
 	 * @param <T> the source type
 	 * @param type the type (must not be {@code null})
 	 * @return a {@link Bindable} instance
@@ -237,6 +246,7 @@ public final class Bindable<T> {
 
 	/**
 	 * Create a new {@link Bindable} {@link List} of the specified element type.
+	 * 创建一个指定数据类型List的Bindable实例对象
 	 * @param <E> the element type
 	 * @param elementType the list element type
 	 * @return a {@link Bindable} instance
@@ -247,6 +257,7 @@ public final class Bindable<T> {
 
 	/**
 	 * Create a new {@link Bindable} {@link Set} of the specified element type.
+	 * 创建一个指定数据类型Set的Bindable实例对象
 	 * @param <E> the element type
 	 * @param elementType the set element type
 	 * @return a {@link Bindable} instance
@@ -257,6 +268,7 @@ public final class Bindable<T> {
 
 	/**
 	 * Create a new {@link Bindable} {@link Map} of the specified key and value type.
+	 * 创建一个指定数据类型Map的Bindable实例对象
 	 * @param <K> the key type
 	 * @param <V> the value type
 	 * @param keyType the map key type
@@ -269,7 +281,9 @@ public final class Bindable<T> {
 
 	/**
 	 * Create a new {@link Bindable} of the specified type.
-	 * @param <T> the source type
+	 * 建一个指定类型的Bindable实例对象
+	 *
+	 * @param <T>  the source type
 	 * @param type the type (must not be {@code null})
 	 * @return a {@link Bindable} instance
 	 * @see #of(Class)
@@ -280,6 +294,12 @@ public final class Bindable<T> {
 		return new Bindable<>(type, boxedType, null, NO_ANNOTATIONS, NO_BIND_RESTRICTIONS);
 	}
 
+	/**
+	 * 将指定的数据类型转换为包装类型
+	 *
+	 * @param type
+	 * @return
+	 */
 	private static ResolvableType box(ResolvableType type) {
 		Class<?> resolved = type.resolve();
 		if (resolved != null && resolved.isPrimitive()) {
@@ -295,6 +315,7 @@ public final class Bindable<T> {
 
 	/**
 	 * Restrictions that can be applied when binding values.
+	 * 绑定值时可以应用的限制
 	 *
 	 * @since 2.5.0
 	 */

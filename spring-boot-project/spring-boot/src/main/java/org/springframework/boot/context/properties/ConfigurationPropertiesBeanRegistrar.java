@@ -39,28 +39,35 @@ import org.springframework.util.StringUtils;
  */
 final class ConfigurationPropertiesBeanRegistrar {
 
+	//bean定义注册器
 	private final BeanDefinitionRegistry registry;
 
+	//IOC容器工厂类
 	private final BeanFactory beanFactory;
 
+	//创建一个bean定义注册器属性配置代理实现类
 	ConfigurationPropertiesBeanRegistrar(BeanDefinitionRegistry registry) {
 		this.registry = registry;
 		this.beanFactory = (BeanFactory) this.registry;
 	}
 
+	//将@ConfigurationProperties注解标注的bean注册到IOC容器
 	void register(Class<?> type) {
 		MergedAnnotation<ConfigurationProperties> annotation = MergedAnnotations
 				.from(type, SearchStrategy.TYPE_HIERARCHY).get(ConfigurationProperties.class);
 		register(type, annotation);
 	}
 
+	//注册配置类
 	void register(Class<?> type, MergedAnnotation<ConfigurationProperties> annotation) {
 		String name = getName(type, annotation);
+		//避免配置类被重复注解
 		if (!containsBeanDefinition(name)) {
 			registerBeanDefinition(name, type, annotation);
 		}
 	}
 
+	//获取带有@ConfigurationProperties注解标注bean前缀的beanName
 	private String getName(Class<?> type, MergedAnnotation<ConfigurationProperties> annotation) {
 		String prefix = annotation.isPresent() ? annotation.getString("prefix") : "";
 		return (StringUtils.hasText(prefix) ? prefix + "-" + type.getName() : type.getName());
@@ -70,6 +77,7 @@ final class ConfigurationPropertiesBeanRegistrar {
 		return containsBeanDefinition(this.beanFactory, name);
 	}
 
+	//判定容器中是否包含指定name的bean定义
 	private boolean containsBeanDefinition(BeanFactory beanFactory, String name) {
 		if (beanFactory instanceof ListableBeanFactory listableBeanFactory
 				&& listableBeanFactory.containsBeanDefinition(name)) {
@@ -88,10 +96,12 @@ final class ConfigurationPropertiesBeanRegistrar {
 		this.registry.registerBeanDefinition(beanName, createBeanDefinition(beanName, type));
 	}
 
+	//根据beanName和class实例创建BeanDefinition
 	private BeanDefinition createBeanDefinition(String beanName, Class<?> type) {
 		BindMethod bindMethod = BindMethod.get(type);
 		RootBeanDefinition definition = new RootBeanDefinition(type);
 		definition.setAttribute(BindMethod.class.getName(), bindMethod);
+		//如果绑定方式是使用构造函数的绑定方式
 		if (bindMethod == BindMethod.VALUE_OBJECT) {
 			definition.setInstanceSupplier(() -> ConstructorBound.from(this.beanFactory, beanName, type));
 		}

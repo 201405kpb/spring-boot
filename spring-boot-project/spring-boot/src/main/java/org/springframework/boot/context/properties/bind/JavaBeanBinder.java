@@ -16,21 +16,6 @@
 
 package org.springframework.boot.context.properties.bind;
 
-import java.beans.Introspector;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.boot.context.properties.bind.Binder.Context;
 import org.springframework.boot.context.properties.source.ConfigurationPropertyName;
@@ -40,33 +25,52 @@ import org.springframework.core.BridgeMethodResolver;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.ResolvableType;
 
+import java.beans.Introspector;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
 /**
  * {@link DataObjectBinder} for mutable Java Beans.
+ * JavaBeanBinder实现类是通过getter/setter绑定
  *
  * @author Phillip Webb
  * @author Madhura Bhave
  */
 class JavaBeanBinder implements DataObjectBinder {
 
+
+	//JavaBeanBinder的空实例对象
 	static final JavaBeanBinder INSTANCE = new JavaBeanBinder();
 
+	//绑定指定的值到指定的属性
 	@Override
 	public <T> T bind(ConfigurationPropertyName name, Bindable<T> target, Context context,
-			DataObjectPropertyBinder propertyBinder) {
+					  DataObjectPropertyBinder propertyBinder) {
 		boolean hasKnownBindableProperties = target.getValue() != null && hasKnownBindableProperties(name, context);
+		//获取javabean的属性字段对应的绑定结果集
 		Bean<T> bean = Bean.get(target, hasKnownBindableProperties);
 		if (bean == null) {
 			return null;
 		}
 		BeanSupplier<T> beanSupplier = bean.getSupplier(target);
+		//绑定字段值，并返回是否绑定成功
 		boolean bound = bind(propertyBinder, bean, beanSupplier, context);
 		return (bound ? beanSupplier.get() : null);
 	}
 
+	//创建属性字段值的实例
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T> T create(Bindable<T> target, Context context) {
+		//获取属性值的class实例
 		Class<T> type = (Class<T>) target.getType().resolve();
+		//实例化属性字段类型
 		return (type != null) ? BeanUtils.instantiateClass(type) : null;
 	}
 
@@ -79,8 +83,9 @@ class JavaBeanBinder implements DataObjectBinder {
 		return false;
 	}
 
+	//将javabean字段属性值绑定为指定的配置属性
 	private <T> boolean bind(DataObjectPropertyBinder propertyBinder, Bean<T> bean, BeanSupplier<T> beanSupplier,
-			Context context) {
+							 Context context) {
 		boolean bound = false;
 		for (BeanProperty beanProperty : bean.getProperties().values()) {
 			bound |= bind(beanSupplier, propertyBinder, beanProperty);
@@ -90,20 +95,25 @@ class JavaBeanBinder implements DataObjectBinder {
 	}
 
 	private <T> boolean bind(BeanSupplier<T> beanSupplier, DataObjectPropertyBinder propertyBinder,
-			BeanProperty property) {
+							 BeanProperty property) {
+		//获取属性字段名
 		String propertyName = property.getName();
+		//获取属性字段类型
 		ResolvableType type = property.getType();
+		//获取属性字段值的Supplier包装对象
 		Supplier<Object> value = property.getValue(beanSupplier);
+		//获取属性字段上标注的注解
 		Annotation[] annotations = property.getAnnotations();
+		//获取属性字段的绑定值
 		Object bound = propertyBinder.bindProperty(propertyName,
 				Bindable.of(type).withSuppliedValue(value).withAnnotations(annotations));
 		if (bound == null) {
 			return false;
 		}
+		//设置属性字段的值
 		if (property.isSettable()) {
 			property.setValue(beanSupplier, bound);
-		}
-		else if (value == null || !bound.equals(value.get())) {
+		} else if (value == null || !bound.equals(value.get())) {
 			throw new IllegalStateException("No setter found for property: " + property.getName());
 		}
 		return true;
@@ -115,24 +125,28 @@ class JavaBeanBinder implements DataObjectBinder {
 	 * @param <T> the bean type
 	 */
 	static class Bean<T> {
-
+		//Bean实例对象
 		private static Bean<?> cached;
-
+		//JavaBean的数据类型
 		private final ResolvableType type;
-
+		//javabean的class实例对象
 		private final Class<?> resolvedType;
-
+		//javabean的属性字段及绑定值之间的映射关系
 		private final Map<String, BeanProperty> properties = new LinkedHashMap<>();
 
 		Bean(ResolvableType type, Class<?> resolvedType) {
+			//初始化type javabean的数据类型
 			this.type = type;
+			//javabean的class实例对象
 			this.resolvedType = resolvedType;
 			addProperties(resolvedType);
 		}
 
 		private void addProperties(Class<?> type) {
 			while (type != null && !Object.class.equals(type)) {
+				//获取javabean的所有方法对象
 				Method[] declaredMethods = getSorted(type, this::getDeclaredMethods, Method::getName);
+				//获取javabean的所有属性字段对象
 				Field[] declaredFields = getSorted(type, Class::getDeclaredFields, Field::getName);
 				addProperties(declaredMethods, declaredFields);
 				type = type.getSuperclass();
@@ -183,7 +197,7 @@ class JavaBeanBinder implements DataObjectBinder {
 		}
 
 		private void addMethodIfPossible(Method method, String prefix, int parameterCount,
-				BiConsumer<BeanProperty, Method> consumer) {
+										 BiConsumer<BeanProperty, Method> consumer) {
 			if (method != null && method.getParameterCount() == parameterCount && method.getName().startsWith(prefix)
 					&& method.getName().length() > prefix.length()) {
 				String propertyName = Introspector.decapitalize(method.getName().substring(prefix.length()));
@@ -191,10 +205,12 @@ class JavaBeanBinder implements DataObjectBinder {
 			}
 		}
 
+		//获取BeanProperty实例对象，即指定属性及值的对应关系
 		private BeanProperty getBeanProperty(String name) {
 			return new BeanProperty(name, this.type);
 		}
 
+		//添加指定字段的Filed属性对象值
 		private void addField(Field field) {
 			BeanProperty property = this.properties.get(field.getName());
 			if (property != null) {
@@ -202,10 +218,12 @@ class JavaBeanBinder implements DataObjectBinder {
 			}
 		}
 
+		//获取javabean属性字段及值的集合
 		Map<String, BeanProperty> getProperties() {
 			return this.properties;
 		}
 
+		//获取绑定值的实例对象
 		@SuppressWarnings("unchecked")
 		BeanSupplier<T> getSupplier(Bindable<T> target) {
 			return new BeanSupplier<>(() -> {
@@ -220,6 +238,7 @@ class JavaBeanBinder implements DataObjectBinder {
 			});
 		}
 
+		//获取当前类的实例对象
 		@SuppressWarnings("unchecked")
 		static <T> Bean<T> get(Bindable<T> bindable, boolean canCallGetValue) {
 			ResolvableType type = bindable.getType();
@@ -288,21 +307,28 @@ class JavaBeanBinder implements DataObjectBinder {
 	 */
 	static class BeanProperty {
 
+		//属性名
 		private final String name;
 
+		//属性配置源对应的java bean类类型实例对象
 		private final ResolvableType declaringClassType;
 
+		//属性对应的getter方法Method对象
 		private Method getter;
 
+		//属性对应的setter方法Method对象
 		private Method setter;
 
+		//属性字段的Field对象
 		private Field field;
 
+		//创建属性的BeanProperty实例对象
 		BeanProperty(String name, ResolvableType declaringClassType) {
 			this.name = DataObjectPropertyName.toDashedForm(name);
 			this.declaringClassType = declaringClassType;
 		}
 
+		//初始化getter对象
 		void addGetter(Method getter) {
 			if (this.getter == null || this.getter.getName().startsWith("is")) {
 				this.getter = getter;
@@ -315,20 +341,24 @@ class JavaBeanBinder implements DataObjectBinder {
 			}
 		}
 
+		//setter方法初始化条件判定
 		private boolean isBetterSetter(Method setter) {
 			return this.getter != null && this.getter.getReturnType().equals(setter.getParameterTypes()[0]);
 		}
 
+		//初始化field对象
 		void addField(Field field) {
 			if (this.field == null) {
 				this.field = field;
 			}
 		}
 
+		//获取属性字段名
 		String getName() {
 			return this.name;
 		}
 
+		//获取字段的数据类型
 		ResolvableType getType() {
 			if (this.setter != null) {
 				MethodParameter methodParameter = new MethodParameter(this.setter, 0);
@@ -338,15 +368,16 @@ class JavaBeanBinder implements DataObjectBinder {
 			return ResolvableType.forMethodParameter(methodParameter, this.declaringClassType);
 		}
 
+		//获取字段上标注的注解
 		Annotation[] getAnnotations() {
 			try {
 				return (this.field != null) ? this.field.getDeclaredAnnotations() : null;
-			}
-			catch (Exception ex) {
+			} catch (Exception ex) {
 				return null;
 			}
 		}
 
+		//获取字段对应的属性值
 		Supplier<Object> getValue(Supplier<?> instance) {
 			if (this.getter == null) {
 				return null;
@@ -355,23 +386,24 @@ class JavaBeanBinder implements DataObjectBinder {
 				try {
 					this.getter.setAccessible(true);
 					return this.getter.invoke(instance.get());
-				}
-				catch (Exception ex) {
+				} catch (Exception ex) {
 					throw new IllegalStateException("Unable to get value for property " + this.name, ex);
 				}
 			};
 		}
 
+		//判定属性字段是否可以设置值
 		boolean isSettable() {
 			return this.setter != null;
 		}
 
+		//设置属性的值
 		void setValue(Supplier<?> instance, Object value) {
 			try {
 				this.setter.setAccessible(true);
+				//获取属性配置源对象，将指定的值设置为指定属性的值
 				this.setter.invoke(instance.get(), value);
-			}
-			catch (Exception ex) {
+			} catch (Exception ex) {
 				throw new IllegalStateException("Unable to set value for property " + this.name, ex);
 			}
 		}

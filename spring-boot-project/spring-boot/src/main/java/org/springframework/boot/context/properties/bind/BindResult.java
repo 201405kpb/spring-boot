@@ -16,13 +16,13 @@
 
 package org.springframework.boot.context.properties.bind;
 
+import org.springframework.util.Assert;
+import org.springframework.util.ObjectUtils;
+
 import java.util.NoSuchElementException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
-import org.springframework.util.Assert;
-import org.springframework.util.ObjectUtils;
 
 /**
  * A container object to return the result of a {@link Binder} bind operation. May contain
@@ -37,8 +37,10 @@ public final class BindResult<T> {
 
 	private static final BindResult<?> UNBOUND = new BindResult<>(null);
 
+	//绑定结果值
 	private final T value;
 
+	//创建有一个BindResult实例对象
 	private BindResult(T value) {
 		this.value = value;
 	}
@@ -46,6 +48,8 @@ public final class BindResult<T> {
 	/**
 	 * Return the object that was bound or throw a {@link NoSuchElementException} if no
 	 * value was bound.
+	 * 返回绑定的对象，如果没有绑定值，则抛出NoSuchElementException 异常。
+	 *
 	 * @return the bound value (never {@code null})
 	 * @throws NoSuchElementException if no value was bound
 	 * @see #isBound()
@@ -59,6 +63,7 @@ public final class BindResult<T> {
 
 	/**
 	 * Returns {@code true} if a result was bound.
+	 * 判定对象是否已经绑定了值
 	 * @return if a result was bound
 	 */
 	public boolean isBound() {
@@ -68,6 +73,7 @@ public final class BindResult<T> {
 	/**
 	 * Invoke the specified consumer with the bound value, or do nothing if no value has
 	 * been bound.
+	 * 使用绑定的值调用指定的消费者，如果值未绑定则什么都不做
 	 * @param consumer block to execute if a value has been bound
 	 */
 	public void ifBound(Consumer<? super T> consumer) {
@@ -80,6 +86,7 @@ public final class BindResult<T> {
 	/**
 	 * Apply the provided mapping function to the bound value, or return an updated
 	 * unbound result if no value has been bound.
+	 * 使用绑定值作为或者值未绑定返回一个更新后的值构建BindResult对象
 	 * @param <U> the type of the result of the mapping function
 	 * @param mapper a mapping function to apply to the bound value. The mapper will not
 	 * be invoked if no value has been bound.
@@ -93,6 +100,7 @@ public final class BindResult<T> {
 
 	/**
 	 * Return the object that was bound, or {@code other} if no value has been bound.
+	 * 返回绑定的值，如果未绑定返回其它值
 	 * @param other the value to be returned if there is no bound value (may be
 	 * {@code null})
 	 * @return the value, if bound, otherwise {@code other}
@@ -104,6 +112,7 @@ public final class BindResult<T> {
 	/**
 	 * Return the object that was bound, or the result of invoking {@code other} if no
 	 * value has been bound.
+	 * 返回绑定的值，如果未绑定返回其它值
 	 * @param other a {@link Supplier} of the value to be returned if there is no bound
 	 * value
 	 * @return the value, if bound, otherwise the supplied {@code other}
@@ -115,6 +124,7 @@ public final class BindResult<T> {
 	/**
 	 * Return the object that was bound, or throw an exception to be created by the
 	 * provided supplier if no value has been bound.
+	 * 返回绑定的值，如果未绑定抛出一个由Supplier创建的异常
 	 * @param <X> the type of the exception to be thrown
 	 * @param exceptionSupplier the supplier which will return the exception to be thrown
 	 * @return the present value
@@ -143,6 +153,7 @@ public final class BindResult<T> {
 		return ObjectUtils.nullSafeHashCode(this.value);
 	}
 
+	// 返回指定绑定结果的BindResult对象
 	@SuppressWarnings("unchecked")
 	static <T> BindResult<T> of(T value) {
 		if (value == null) {

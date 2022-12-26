@@ -16,10 +16,6 @@
 
 package org.springframework.boot.context.properties;
 
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -36,6 +32,10 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
+
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * {@link ImportBeanDefinitionRegistrar} for registering
@@ -58,22 +58,31 @@ class ConfigurationPropertiesScanRegistrar implements ImportBeanDefinitionRegist
 
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
+		//获取包扫描范围,默认扫描@ConfigurationPropertiesScan所在类的包和子包
 		Set<String> packagesToScan = getPackagesToScan(importingClassMetadata);
+		//执行包扫描,只扫描被@ConfigurationProperties标记的类
 		scan(registry, packagesToScan);
 	}
 
 	private Set<String> getPackagesToScan(AnnotationMetadata metadata) {
+		// 获取 ConfigurationPropertiesScan 注解对应的属性信息
 		AnnotationAttributes attributes = AnnotationAttributes
 				.fromMap(metadata.getAnnotationAttributes(ConfigurationPropertiesScan.class.getName()));
+		// 获取 basePackages 属性
 		String[] basePackages = attributes.getStringArray("basePackages");
+		// 获取 basePackageClasses 属性值
 		Class<?>[] basePackageClasses = attributes.getClassArray("basePackageClasses");
+		// 创建 packagesToScan 对象，避免重复
 		Set<String> packagesToScan = new LinkedHashSet<>(Arrays.asList(basePackages));
+		// 添加 basePackageClasses 中 class 对象所在的包
 		for (Class<?> basePackageClass : basePackageClasses) {
 			packagesToScan.add(ClassUtils.getPackageName(basePackageClass));
 		}
+		// 若 packagesToScan 为空，则添加 metadata 对应类所在的包
 		if (packagesToScan.isEmpty()) {
 			packagesToScan.add(ClassUtils.getPackageName(metadata.getClassName()));
 		}
+		// 移除空值
 		packagesToScan.removeIf((candidate) -> !StringUtils.hasText(candidate));
 		return packagesToScan;
 	}
