@@ -62,6 +62,14 @@ class ConfigurationPropertiesBinder {
 	 */
 	private static final String BEAN_NAME = "org.springframework.boot.context.internalConfigurationPropertiesBinder";
 
+	/**
+	 * ConfigurationPropertiesBinderFactory 对象名称
+	 */
+	private static final String FACTORY_BEAN_NAME = "org.springframework.boot.context.internalConfigurationPropertiesBinderFactory";
+
+	/**
+	 * Validator 对象名称
+	 */
 	private static final String VALIDATOR_BEAN_NAME = EnableConfigurationProperties.VALIDATOR_BEAN_NAME;
 
 	private final ApplicationContext applicationContext;
