@@ -16,9 +16,6 @@
 
 package org.springframework.boot.context.properties;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.aot.generate.GenerationContext;
 import org.springframework.beans.factory.aot.BeanFactoryInitializationAotContribution;
 import org.springframework.beans.factory.aot.BeanFactoryInitializationAotProcessor;
@@ -28,9 +25,14 @@ import org.springframework.boot.context.properties.bind.BindableRuntimeHintsRegi
 import org.springframework.util.ClassUtils;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * {@link BeanFactoryInitializationAotProcessor} that contributes runtime hints for
  * configuration properties-annotated beans.
+ * <p>
+ * BeanFactoryInitializationAotProcessor为配置属性注释的bean提供运行时提示。
  *
  * @author Stephane Nicoll
  * @author Christoph Strobl

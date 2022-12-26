@@ -16,17 +16,6 @@
 
 package org.springframework.boot.context.properties.bind;
 
-import java.beans.PropertyEditor;
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.beans.SimpleTypeConverter;
@@ -35,18 +24,20 @@ import org.springframework.beans.propertyeditors.CustomNumberEditor;
 import org.springframework.beans.propertyeditors.FileEditor;
 import org.springframework.boot.convert.ApplicationConversionService;
 import org.springframework.core.ResolvableType;
-import org.springframework.core.convert.ConversionException;
-import org.springframework.core.convert.ConversionFailedException;
-import org.springframework.core.convert.ConversionService;
-import org.springframework.core.convert.ConverterNotFoundException;
-import org.springframework.core.convert.TypeDescriptor;
+import org.springframework.core.convert.*;
 import org.springframework.core.convert.converter.ConditionalGenericConverter;
 import org.springframework.core.convert.support.GenericConversionService;
 import org.springframework.util.CollectionUtils;
 
+import java.beans.PropertyEditor;
+import java.lang.annotation.Annotation;
+import java.util.*;
+import java.util.function.Consumer;
+
 /**
  * Utility to handle any conversion needed during binding. This class is not thread-safe
  * and so a new instance is created for each top-level bind.
+ * 用于处理绑定期间所需的任何转换的实用程序。此类不是线程安全的，因此会为每个顶级绑定创建一个新实例。
  *
  * @author Phillip Webb
  * @author Andy Wilkinson

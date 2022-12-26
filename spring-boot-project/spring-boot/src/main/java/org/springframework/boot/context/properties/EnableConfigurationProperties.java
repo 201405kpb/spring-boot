@@ -16,14 +16,10 @@
 
 package org.springframework.boot.context.properties;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+
+import java.lang.annotation.*;
 
 /**
  * Enable support for {@link ConfigurationProperties @ConfigurationProperties} annotated
@@ -42,6 +38,8 @@ public @interface EnableConfigurationProperties {
 
 	/**
 	 * The bean name of the configuration properties validator.
+	 * 配置属性验证器的bean名称。
+	 *
 	 * @since 2.2.0
 	 */
 	String VALIDATOR_BEAN_NAME = "configurationPropertiesValidator";
@@ -50,6 +48,7 @@ public @interface EnableConfigurationProperties {
 	 * Convenient way to quickly register
 	 * {@link ConfigurationProperties @ConfigurationProperties} annotated beans with
 	 * Spring. Standard Spring Beans will also be scanned regardless of this value.
+	 * 用Spring快速注册 注释bean的便捷方法。无论该值如何，标准SpringBeans也将被扫描。
 	 * @return {@code @ConfigurationProperties} annotated beans to register
 	 */
 	Class<?>[] value() default {};
