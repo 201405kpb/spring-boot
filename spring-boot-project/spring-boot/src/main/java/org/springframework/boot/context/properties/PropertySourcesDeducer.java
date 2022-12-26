@@ -16,11 +16,8 @@
 
 package org.springframework.boot.context.properties;
 
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.ConfigurableEnvironment;
@@ -29,8 +26,11 @@ import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySources;
 import org.springframework.util.Assert;
 
+import java.util.Map;
+
 /**
  * Utility to deduce the {@link PropertySources} to use for configuration binding.
+ * 用于推导用于配置绑定的PropertySources的实用程序。
  *
  * @author Phillip Webb
  */

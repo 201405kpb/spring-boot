@@ -16,19 +16,17 @@
 
 package org.springframework.boot.context.properties;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * Indicates that a getter in a {@link ConfigurationProperties @ConfigurationProperties}
  * object is deprecated. This annotation has no bearing on the actual binding processes,
  * but it is used by the {@code spring-boot-configuration-processor} to add deprecation
  * meta-data.
+ * 指示ConfigurationProperties对象中的getter已弃用。此注释与实际绑定过程无关，但spring boot配置处理器使用它来添加弃用元数据。
  * <p>
  * This annotation <strong>must</strong> be used on the getter of the deprecated element.
+ * 此注释必须用于已弃用元素的getter。
  *
  * @author Phillip Webb
  * @since 1.3.0

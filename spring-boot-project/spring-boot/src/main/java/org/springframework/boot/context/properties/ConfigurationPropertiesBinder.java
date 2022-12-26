@@ -16,10 +16,6 @@
 
 package org.springframework.boot.context.properties;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Consumer;
-
 import org.springframework.beans.BeansException;
 import org.springframework.beans.PropertyEditorRegistry;
 import org.springframework.beans.factory.BeanFactory;
@@ -27,15 +23,8 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.boot.context.properties.bind.AbstractBindHandler;
-import org.springframework.boot.context.properties.bind.BindContext;
-import org.springframework.boot.context.properties.bind.BindHandler;
-import org.springframework.boot.context.properties.bind.BindResult;
-import org.springframework.boot.context.properties.bind.Bindable;
+import org.springframework.boot.context.properties.bind.*;
 import org.springframework.boot.context.properties.bind.Bindable.BindRestriction;
-import org.springframework.boot.context.properties.bind.Binder;
-import org.springframework.boot.context.properties.bind.BoundPropertiesTrackingBindHandler;
-import org.springframework.boot.context.properties.bind.PropertySourcesPlaceholdersResolver;
 import org.springframework.boot.context.properties.bind.handler.IgnoreErrorsBindHandler;
 import org.springframework.boot.context.properties.bind.handler.IgnoreTopLevelConverterNotFoundBindHandler;
 import org.springframework.boot.context.properties.bind.handler.NoUnboundElementsBindHandler;
@@ -54,15 +43,23 @@ import org.springframework.util.Assert;
 import org.springframework.validation.Validator;
 import org.springframework.validation.annotation.Validated;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+
 /**
  * Internal class used by the {@link ConfigurationPropertiesBindingPostProcessor} to
  * handle the actual {@link ConfigurationProperties @ConfigurationProperties} binding.
+ * ConfigurationPropertiesBindingPostProcessor用于处理实际ConfigurationPropertis@ConfigurationProperties绑定的内部类。
  *
  * @author Stephane Nicoll
  * @author Phillip Webb
  */
 class ConfigurationPropertiesBinder {
 
+	/**
+	 * ConfigurationPropertiesBinder 对象名称
+	 */
 	private static final String BEAN_NAME = "org.springframework.boot.context.internalConfigurationPropertiesBinder";
 
 	private static final String VALIDATOR_BEAN_NAME = EnableConfigurationProperties.VALIDATOR_BEAN_NAME;
@@ -148,6 +145,11 @@ class ConfigurationPropertiesBinder {
 		return validators;
 	}
 
+	/**
+	 * 获取 Jsr303 验证器
+	 *
+	 * @return
+	 */
 	private Validator getJsr303Validator() {
 		if (this.jsr303Validator == null) {
 			this.jsr303Validator = new ConfigurationPropertiesJsr303Validator(this.applicationContext);

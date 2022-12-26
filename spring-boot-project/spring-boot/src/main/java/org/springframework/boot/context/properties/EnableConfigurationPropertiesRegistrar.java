@@ -16,10 +16,6 @@
 
 package org.springframework.boot.context.properties;
 
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -28,6 +24,10 @@ import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.Conventions;
 import org.springframework.core.annotation.MergedAnnotation;
 import org.springframework.core.type.AnnotationMetadata;
+
+import java.util.Arrays;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * {@link ImportBeanDefinitionRegistrar} for
@@ -43,12 +43,17 @@ class EnableConfigurationPropertiesRegistrar implements ImportBeanDefinitionRegi
 
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
+		// 注册基础设置Bean
 		registerInfrastructureBeans(registry);
 		registerMethodValidationExcludeFilter(registry);
+		//创建注册器代理类
 		ConfigurationPropertiesBeanRegistrar beanRegistrar = new ConfigurationPropertiesBeanRegistrar(registry);
+		//获取@EnableConfigurationProperties注解参数指定的配置类,并将其注册成Bean,beanName为 " prefix+配置类全类名"。
 		getTypes(metadata).forEach(beanRegistrar::register);
 	}
 
+
+	//获取注解@EnableConfigurationProperties指定的被@ConfigurationProperties注解标注的bean实例对象
 	private Set<Class<?>> getTypes(AnnotationMetadata metadata) {
 		return metadata.getAnnotations()
 			.stream(EnableConfigurationProperties.class)
@@ -57,12 +62,16 @@ class EnableConfigurationPropertiesRegistrar implements ImportBeanDefinitionRegi
 			.collect(Collectors.toSet());
 	}
 
+	//注册相关后置处理器和Bean用于注定绑定
 	static void registerInfrastructureBeans(BeanDefinitionRegistry registry) {
+		//将BeanPostProcessor bean后置处理器ConfigurationPropertiesBindingPostProcessor注册到IOC容器
 		ConfigurationPropertiesBindingPostProcessor.register(registry);
+		//将提供属性绑定的BoundConfigurationProperties类注册到IOC容器之中
 		BoundConfigurationProperties.register(registry);
 	}
 
 	static void registerMethodValidationExcludeFilter(BeanDefinitionRegistry registry) {
+		//判断 MethodValidationExcludeFilter 是否已经注册
 		if (!registry.containsBeanDefinition(METHOD_VALIDATION_EXCLUDE_FILTER_BEAN_NAME)) {
 			BeanDefinition definition = BeanDefinitionBuilder
 				.rootBeanDefinition(MethodValidationExcludeFilter.class, "byAnnotation")
