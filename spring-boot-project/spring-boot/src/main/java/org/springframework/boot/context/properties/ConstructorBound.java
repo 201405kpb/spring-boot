@@ -19,12 +19,13 @@ package org.springframework.boot.context.properties;
 import org.springframework.beans.factory.BeanFactory;
 
 /**
- * Helper class to programmatically bind configuration properties that use constructor
- * injection.
+ * Helper class to programmatically bind configuration properties that use constructor injection.
+ * <p>
+ * 帮助程序类以编程方式绑定使用构造函数注入的配置属性
  *
  * @author Stephane Nicoll
- * @since 3.0.0
  * @see ConstructorBinding
+ * @since 3.0.0
  */
 public abstract class ConstructorBound {
 

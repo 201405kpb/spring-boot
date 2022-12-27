@@ -146,7 +146,7 @@ public class Binder {
 			BindHandler defaultBindHandler, BindConstructorProvider constructorProvider) {
 		this(sources, placeholdersResolver,
 				(conversionService != null) ? Collections.singletonList(conversionService)
-						: (List<ConversionService>) null,
+						: null,
 				propertyEditorInitializer, defaultBindHandler, constructorProvider);
 	}
 

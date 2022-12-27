@@ -30,12 +30,14 @@ public interface BindConstructorProvider {
 	/**
 	 * Default {@link BindConstructorProvider} implementation that only returns a value
 	 * when there's a single constructor and when the bindable has no existing value.
+	 * 默认BindConstructorProvider实现，仅在存在单个构造函数且可绑定对象没有现有值时才返回值。
 	 */
 	BindConstructorProvider DEFAULT = new DefaultBindConstructorProvider();
 
 	/**
 	 * Return the bind constructor to use for the given type, or {@code null} if
 	 * constructor binding is not supported.
+	 * 返回用于给定可绑定对象的绑定构造函数，如果不支持构造函数绑定，则返回null 。
 	 * @param type the type to check
 	 * @param isNestedConstructorBinding if this binding is nested within a constructor
 	 * binding
@@ -49,6 +51,7 @@ public interface BindConstructorProvider {
 	/**
 	 * Return the bind constructor to use for the given bindable, or {@code null} if
 	 * constructor binding is not supported.
+	 * 返回用于给定可绑定对象的绑定构造函数，如果不支持构造函数绑定，则返回null 。
 	 * @param bindable the bindable to check
 	 * @param isNestedConstructorBinding if this binding is nested within a constructor
 	 * binding
