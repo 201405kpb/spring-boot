@@ -16,15 +16,7 @@
 
 package org.springframework.boot.context.config;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
-
 import org.springframework.boot.BootstrapRegistry.InstanceSupplier;
 import org.springframework.boot.BootstrapRegistry.Scope;
 import org.springframework.boot.ConfigurableBootstrapContext;
@@ -44,6 +36,8 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.SpringFactoriesLoader;
 import org.springframework.core.log.LogMessage;
 import org.springframework.util.StringUtils;
+
+import java.util.*;
 
 /**
  * Wrapper around a {@link ConfigurableEnvironment} that can be used to import and apply
@@ -84,6 +78,7 @@ class ConfigDataEnvironment {
 
 	/**
 	 * Default search locations used if not {@link #LOCATION_PROPERTY} is found.
+	 * 如果未找到LOCATION_PROPERTY，则使用默认搜索位置。
 	 */
 	static final ConfigDataLocation[] DEFAULT_SEARCH_LOCATIONS;
 	static {
@@ -122,6 +117,7 @@ class ConfigDataEnvironment {
 
 	private final ConfigDataLoaders loaders;
 
+	// 属性值提供器
 	private final ConfigDataEnvironmentContributors contributors;
 
 	/**
@@ -151,15 +147,22 @@ class ConfigDataEnvironment {
 				: ConfigDataEnvironmentUpdateListener.NONE;
 		this.loaders = new ConfigDataLoaders(logFactory, bootstrapContext,
 				SpringFactoriesLoader.forDefaultResourceLocation());
+		// 创建默认的属性值提供器
 		this.contributors = createContributors(binder);
 	}
 
 	protected ConfigDataLocationResolvers createConfigDataLocationResolvers(DeferredLogFactory logFactory,
-			ConfigurableBootstrapContext bootstrapContext, Binder binder, ResourceLoader resourceLoader) {
+																			ConfigurableBootstrapContext bootstrapContext, Binder binder, ResourceLoader resourceLoader) {
 		return new ConfigDataLocationResolvers(logFactory, bootstrapContext, binder, resourceLoader,
 				SpringFactoriesLoader.forDefaultResourceLocation(resourceLoader.getClassLoader()));
 	}
 
+	/**
+	 * 创建默认的属性值提供器
+	 *
+	 * @param binder
+	 * @return
+	 */
 	private ConfigDataEnvironmentContributors createContributors(Binder binder) {
 		this.logger.trace("Building config data environment contributors");
 		MutablePropertySources propertySources = this.environment.getPropertySources();
@@ -168,8 +171,7 @@ class ConfigDataEnvironment {
 		for (PropertySource<?> propertySource : propertySources) {
 			if (DefaultPropertiesPropertySource.hasMatchingName(propertySource)) {
 				defaultPropertySource = propertySource;
-			}
-			else {
+			} else {
 				this.logger.trace(LogMessage.format("Creating wrapped config data contributor for '%s'",
 						propertySource.getName()));
 				contributors.add(ConfigDataEnvironmentContributor.ofExisting(propertySource));
@@ -194,9 +196,12 @@ class ConfigDataEnvironment {
 
 	private List<ConfigDataEnvironmentContributor> getInitialImportContributors(Binder binder) {
 		List<ConfigDataEnvironmentContributor> initialContributors = new ArrayList<>();
+		// 增加 `spring.config.import` 指定的资源
 		addInitialImportContributors(initialContributors, bindLocations(binder, IMPORT_PROPERTY, EMPTY_LOCATIONS));
+		// 增加 `spring.config.additional-location` 指定的资源
 		addInitialImportContributors(initialContributors,
 				bindLocations(binder, ADDITIONAL_LOCATION_PROPERTY, EMPTY_LOCATIONS));
+		// 增加 `spring.config.location` 指定的资源
 		addInitialImportContributors(initialContributors,
 				bindLocations(binder, LOCATION_PROPERTY, DEFAULT_SEARCH_LOCATIONS));
 		return initialContributors;
@@ -226,12 +231,19 @@ class ConfigDataEnvironment {
 		ConfigDataImporter importer = new ConfigDataImporter(this.logFactory, this.notFoundAction, this.resolvers,
 				this.loaders);
 		registerBootstrapBinder(this.contributors, null, DENY_INACTIVE_BINDING);
+		// 导入 `spring.config.import` 指定的资源
 		ConfigDataEnvironmentContributors contributors = processInitial(this.contributors, importer);
+		// 创立一个配置数据激活上下文对象，如果绑定到了没有active的属性源，则报错
+		// 比方：spring.profiles.active=prod，但绑定了 application-dev.yaml
 		ConfigDataActivationContext activationContext = createActivationContext(
 				contributors.getBinder(null, BinderOption.FAIL_ON_BIND_TO_INACTIVE_SOURCE));
+		// 导入无 profile `application.yaml` 的资源
 		contributors = processWithoutProfiles(contributors, importer, activationContext);
+		// 载入profiles到绑定的上下文中
 		activationContext = withProfiles(contributors, activationContext);
+		// 导入激活 profile `application-[active].yaml` 的资源
 		contributors = processWithProfiles(contributors, importer, activationContext);
+		// 绑定到环境变量中
 		applyToEnvironment(contributors, activationContext, importer.getLoadedLocations(),
 				importer.getOptionalLocations());
 	}

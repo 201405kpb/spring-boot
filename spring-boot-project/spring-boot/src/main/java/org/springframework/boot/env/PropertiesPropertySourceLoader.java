@@ -16,19 +16,20 @@
 
 package org.springframework.boot.env;
 
+import org.springframework.boot.env.OriginTrackedPropertiesLoader.Document;
+import org.springframework.core.env.PropertySource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PropertiesLoaderUtils;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.boot.env.OriginTrackedPropertiesLoader.Document;
-import org.springframework.core.env.PropertySource;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PropertiesLoaderUtils;
-
 /**
  * Strategy to load '.properties' files into a {@link PropertySource}.
+ * 将“.properties”文件加载到PropertySource｝的策略
  *
  * @author Dave Syer
  * @author Phillip Webb

@@ -16,9 +16,6 @@
 
 package org.springframework.boot.env;
 
-import java.util.List;
-import java.util.function.Function;
-
 import org.springframework.boot.ConfigurableBootstrapContext;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
@@ -31,9 +28,14 @@ import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.io.ResourceLoader;
 
+import java.util.List;
+import java.util.function.Function;
+
 /**
  * {@link SmartApplicationListener} used to trigger {@link EnvironmentPostProcessor
  * EnvironmentPostProcessors} registered in the {@code spring.factories} file.
+ * <p>
+ * SmartApplicationListener 用于触发在 spring.factories文件中注册的EnvironmentPostProcessor。
  *
  * @author Phillip Webb
  * @since 2.4.0
@@ -42,6 +44,7 @@ public class EnvironmentPostProcessorApplicationListener implements SmartApplica
 
 	/**
 	 * The default order for the processor.
+	 * 处理器的默认顺序
 	 */
 	public static final int DEFAULT_ORDER = Ordered.HIGHEST_PRECEDENCE + 10;
 
@@ -54,6 +57,7 @@ public class EnvironmentPostProcessorApplicationListener implements SmartApplica
 	/**
 	 * Create a new {@link EnvironmentPostProcessorApplicationListener} with
 	 * {@link EnvironmentPostProcessor} classes loaded through {@code spring.factories}.
+	 * 使用通过 spring.factories加载的 EnvironmentPostProcessor类创建新的EnvironmentPostProcessorApplicationListener。
 	 */
 	public EnvironmentPostProcessorApplicationListener() {
 		this(EnvironmentPostProcessorsFactory::fromSpringFactories);
@@ -62,6 +66,7 @@ public class EnvironmentPostProcessorApplicationListener implements SmartApplica
 	/**
 	 * Create a new {@link EnvironmentPostProcessorApplicationListener} with post
 	 * processors created by the given factory.
+	 * 使用工厂类创建新的EnvironmentPostProcessorApplicationListener。
 	 * @param postProcessorsFactory the post processors factory
 	 */
 	private EnvironmentPostProcessorApplicationListener(
@@ -73,6 +78,7 @@ public class EnvironmentPostProcessorApplicationListener implements SmartApplica
 	/**
 	 * Factory method that creates an {@link EnvironmentPostProcessorApplicationListener}
 	 * with a specific {@link EnvironmentPostProcessorsFactory}.
+	 * 使用 EnvironmentPostProcessorsFactory 创建 EnvironmentPostProcessorApplicationListener 对象
 	 * @param postProcessorsFactory the environment post processor factory
 	 * @return an {@link EnvironmentPostProcessorApplicationListener} instance
 	 */
@@ -88,8 +94,10 @@ public class EnvironmentPostProcessorApplicationListener implements SmartApplica
 				|| ApplicationFailedEvent.class.isAssignableFrom(eventType);
 	}
 
+	//事件回调处理
 	@Override
 	public void onApplicationEvent(ApplicationEvent event) {
+		//判断事件类型
 		if (event instanceof ApplicationEnvironmentPreparedEvent environmentPreparedEvent) {
 			onApplicationEnvironmentPreparedEvent(environmentPreparedEvent);
 		}
@@ -102,8 +110,11 @@ public class EnvironmentPostProcessorApplicationListener implements SmartApplica
 	}
 
 	private void onApplicationEnvironmentPreparedEvent(ApplicationEnvironmentPreparedEvent event) {
+		// 获取环境变量
 		ConfigurableEnvironment environment = event.getEnvironment();
+		// 获取SpringApplication 对象
 		SpringApplication application = event.getSpringApplication();
+		//获取EnvironmentPostProcessors实现子类并调用postProcessEnvironment方法
 		for (EnvironmentPostProcessor postProcessor : getEnvironmentPostProcessors(application.getResourceLoader(),
 				event.getBootstrapContext())) {
 			postProcessor.postProcessEnvironment(environment, application);
@@ -125,7 +136,9 @@ public class EnvironmentPostProcessorApplicationListener implements SmartApplica
 	List<EnvironmentPostProcessor> getEnvironmentPostProcessors(ResourceLoader resourceLoader,
 			ConfigurableBootstrapContext bootstrapContext) {
 		ClassLoader classLoader = (resourceLoader != null) ? resourceLoader.getClassLoader() : null;
+		//应用函数式接口创建对象
 		EnvironmentPostProcessorsFactory postProcessorsFactory = this.postProcessorsFactory.apply(classLoader);
+		// 获取 spring.factories 文件中配置的 EnvironmentPostProcessor 对象集合
 		return postProcessorsFactory.getEnvironmentPostProcessors(this.deferredLogs, bootstrapContext);
 	}
 
