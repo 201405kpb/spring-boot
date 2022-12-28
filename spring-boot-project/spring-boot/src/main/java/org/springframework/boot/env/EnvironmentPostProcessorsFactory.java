@@ -25,6 +25,7 @@ import org.springframework.core.io.support.SpringFactoriesLoader;
 /**
  * Factory interface used by the {@link EnvironmentPostProcessorApplicationListener} to
  * create the {@link EnvironmentPostProcessor} instances.
+ * 使用 EnvironmentPostProcessorApplicationListener 创建  EnvironmentPostProcessor 实例的工厂接口
  *
  * @author Phillip Webb
  * @since 2.4.0
@@ -33,17 +34,9 @@ import org.springframework.core.io.support.SpringFactoriesLoader;
 public interface EnvironmentPostProcessorsFactory {
 
 	/**
-	 * Create all requested {@link EnvironmentPostProcessor} instances.
-	 * @param logFactory a deferred log factory
-	 * @param bootstrapContext a bootstrap context
-	 * @return the post processor instances
-	 */
-	List<EnvironmentPostProcessor> getEnvironmentPostProcessors(DeferredLogFactory logFactory,
-			ConfigurableBootstrapContext bootstrapContext);
-
-	/**
 	 * Return a {@link EnvironmentPostProcessorsFactory} backed by
 	 * {@code spring.factories}.
+	 *  使用 spring.factories 创建 EnvironmentPostProcessorsFactory 对象
 	 * @param classLoader the source class loader
 	 * @return an {@link EnvironmentPostProcessorsFactory} instance
 	 */
@@ -55,6 +48,7 @@ public interface EnvironmentPostProcessorsFactory {
 	/**
 	 * Return a {@link EnvironmentPostProcessorsFactory} that reflectively creates post
 	 * processors from the given classes.
+	 * 使用 EnvironmentPostProcessor 类型创建 EnvironmentPostProcessorsFactory 对象
 	 * @param classes the post processor classes
 	 * @return an {@link EnvironmentPostProcessorsFactory} instance
 	 */
@@ -65,6 +59,7 @@ public interface EnvironmentPostProcessorsFactory {
 	/**
 	 * Return a {@link EnvironmentPostProcessorsFactory} that reflectively creates post
 	 * processors from the given class names.
+	 * 使用 EnvironmentPostProcessor 类型名称创建 EnvironmentPostProcessorsFactory 对象
 	 * @param classNames the post processor class names
 	 * @return an {@link EnvironmentPostProcessorsFactory} instance
 	 */
@@ -75,6 +70,7 @@ public interface EnvironmentPostProcessorsFactory {
 	/**
 	 * Return a {@link EnvironmentPostProcessorsFactory} that reflectively creates post
 	 * processors from the given class names.
+	 * 使用 类加载器与 EnvironmentPostProcessor 类型名称创建 EnvironmentPostProcessorsFactory 对象
 	 * @param classLoader the source class loader
 	 * @param classNames the post processor class names
 	 * @return an {@link EnvironmentPostProcessorsFactory} instance
@@ -83,5 +79,15 @@ public interface EnvironmentPostProcessorsFactory {
 	static EnvironmentPostProcessorsFactory of(ClassLoader classLoader, String... classNames) {
 		return new ReflectionEnvironmentPostProcessorsFactory(classLoader, classNames);
 	}
+
+	/**
+	 * Create all requested {@link EnvironmentPostProcessor} instances.
+	 * 创建全部 EnvironmentPostProcessor 实例对象
+	 * @param logFactory a deferred log factory
+	 * @param bootstrapContext a bootstrap context
+	 * @return the post processor instances
+	 */
+	List<EnvironmentPostProcessor> getEnvironmentPostProcessors(DeferredLogFactory logFactory,
+			ConfigurableBootstrapContext bootstrapContext);
 
 }

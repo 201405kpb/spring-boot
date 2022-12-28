@@ -27,6 +27,7 @@ import java.util.function.Supplier;
 /**
  * A container object to return the result of a {@link Binder} bind operation. May contain
  * either a successfully bound object or an empty result.
+ * 一个容器对象，用于返回Binder绑定操作的结果。 可能包含成功绑定的对象或空结果。
  *
  * @param <T> the result type
  * @author Phillip Webb

@@ -87,8 +87,11 @@ class JavaBeanBinder implements DataObjectBinder {
 	private <T> boolean bind(DataObjectPropertyBinder propertyBinder, Bean<T> bean, BeanSupplier<T> beanSupplier,
 							 Context context) {
 		boolean bound = false;
+		// 遍历我们刚刚获取的 Properties 里面的 属性
 		for (BeanProperty beanProperty : bean.getProperties().values()) {
+			//按位或的意思就是先把a和b都换成二进制，然后用或操作，相当于 a=a|b
 			bound |= bind(beanSupplier, propertyBinder, beanProperty);
+			// 清除一下已经绑定的属性
 			context.clearConfigurationProperty();
 		}
 		return bound;
@@ -139,6 +142,7 @@ class JavaBeanBinder implements DataObjectBinder {
 			this.type = type;
 			//javabean的class实例对象
 			this.resolvedType = resolvedType;
+			//获取配置文件
 			addProperties(resolvedType);
 		}
 
@@ -168,6 +172,12 @@ class JavaBeanBinder implements DataObjectBinder {
 			return result;
 		}
 
+		/**
+		 * 经过一些列反射操作之后，把属性填充到我们当前对象 JavaBeanBinde
+		 *
+		 * @param declaredMethods
+		 * @param declaredFields
+		 */
 		protected void addProperties(Method[] declaredMethods, Field[] declaredFields) {
 			for (int i = 0; i < declaredMethods.length; i++) {
 				if (!isCandidate(declaredMethods[i])) {
