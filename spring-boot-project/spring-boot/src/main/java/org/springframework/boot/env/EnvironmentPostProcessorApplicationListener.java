@@ -16,9 +16,6 @@
 
 package org.springframework.boot.env;
 
-import java.util.List;
-import java.util.function.Function;
-
 import org.springframework.boot.ConfigurableBootstrapContext;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.event.ApplicationEnvironmentPreparedEvent;
@@ -30,6 +27,9 @@ import org.springframework.context.event.SmartApplicationListener;
 import org.springframework.core.Ordered;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.io.ResourceLoader;
+
+import java.util.List;
+import java.util.function.Function;
 
 /**
  * {@link SmartApplicationListener} used to trigger {@link EnvironmentPostProcessor
@@ -88,8 +88,10 @@ public class EnvironmentPostProcessorApplicationListener implements SmartApplica
 				|| ApplicationFailedEvent.class.isAssignableFrom(eventType);
 	}
 
+	//事件回调处理
 	@Override
 	public void onApplicationEvent(ApplicationEvent event) {
+		//判断事件类型
 		if (event instanceof ApplicationEnvironmentPreparedEvent environmentPreparedEvent) {
 			onApplicationEnvironmentPreparedEvent(environmentPreparedEvent);
 		}
@@ -104,6 +106,7 @@ public class EnvironmentPostProcessorApplicationListener implements SmartApplica
 	private void onApplicationEnvironmentPreparedEvent(ApplicationEnvironmentPreparedEvent event) {
 		ConfigurableEnvironment environment = event.getEnvironment();
 		SpringApplication application = event.getSpringApplication();
+		//获取EnvironmentPostProcessors实现子类并调用postProcessEnvironment方法
 		for (EnvironmentPostProcessor postProcessor : getEnvironmentPostProcessors(application.getResourceLoader(),
 				event.getBootstrapContext())) {
 			postProcessor.postProcessEnvironment(environment, application);

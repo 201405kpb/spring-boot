@@ -27,6 +27,7 @@ import org.springframework.core.env.Environment;
 /**
  * Allows for customization of the application's {@link Environment} prior to the
  * application context being refreshed.
+ * 允许在刷新应用程序上下文之前自定义应用程序的Environment。
  * <p>
  * EnvironmentPostProcessor implementations have to be registered in
  * {@code META-INF/spring.factories}, using the fully qualified name of this class as the
