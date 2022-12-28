@@ -27,12 +27,14 @@ import org.springframework.core.env.Environment;
 /**
  * Allows for customization of the application's {@link Environment} prior to the
  * application context being refreshed.
+ * 允许在刷新应用程序上下文之前自定义应用程序的Environment。
  * <p>
  * EnvironmentPostProcessor implementations have to be registered in
  * {@code META-INF/spring.factories}, using the fully qualified name of this class as the
  * key. Implementations may implement the {@link org.springframework.core.Ordered Ordered}
  * interface or use an {@link org.springframework.core.annotation.Order @Order} annotation
  * if they wish to be invoked in specific order.
+ * EnvironmentPostProcessor实现必须在 spring.factories中注册，使用该类的完全限定名作为key.
  * <p>
  * Since Spring Boot 2.4, {@code EnvironmentPostProcessor} implementations may optionally
  * take the following constructor parameters:

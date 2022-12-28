@@ -16,13 +16,7 @@
 
 package org.springframework.boot.context.config;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.function.Supplier;
-
 import org.apache.commons.logging.Log;
-
 import org.springframework.boot.ConfigurableBootstrapContext;
 import org.springframework.boot.DefaultBootstrapContext;
 import org.springframework.boot.SpringApplication;
@@ -34,9 +28,16 @@ import org.springframework.core.env.Environment;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.function.Supplier;
+
 /**
  * {@link EnvironmentPostProcessor} that loads and applies {@link ConfigData} to Spring's
  * {@link Environment}.
+ * <p>
+ * EnvironmentPostProcessor 用于加载ConfigData并将其应用于Spring的Environment。
  *
  * @author Phillip Webb
  * @author Madhura Bhave
@@ -90,14 +91,17 @@ public class ConfigDataEnvironmentPostProcessor implements EnvironmentPostProces
 	}
 
 	void postProcessEnvironment(ConfigurableEnvironment environment, ResourceLoader resourceLoader,
-			Collection<String> additionalProfiles) {
+								Collection<String> additionalProfiles) {
 		this.logger.trace("Post-processing environment to add config data");
+		//获取资源加载器
 		resourceLoader = (resourceLoader != null) ? resourceLoader : new DefaultResourceLoader();
+		//加载和应用资源
 		getConfigDataEnvironment(environment, resourceLoader, additionalProfiles).processAndApply();
 	}
 
+	// 获取环境对象
 	ConfigDataEnvironment getConfigDataEnvironment(ConfigurableEnvironment environment, ResourceLoader resourceLoader,
-			Collection<String> additionalProfiles) {
+												   Collection<String> additionalProfiles) {
 		return new ConfigDataEnvironment(this.logFactory, this.bootstrapContext, environment, resourceLoader,
 				additionalProfiles, this.environmentUpdateListener);
 	}
