@@ -45,6 +45,10 @@ import org.springframework.util.StringUtils;
  * <p>
  * Properties are automatically propagated up to any parent context.
  *
+ * ServerPortInfoApplicationContextInitializer是ApplicationContextInitializer接口的实现类，会通过SPI方式在应用程序启动时初始化，
+ * 其主要作用是在环境Environment中添加一个属性源，将应用的本地端口号添加进去，方便通过@Value或environment获取本地端口号；
+ * ServerPortInfoApplicationContextInitializer初始化器还实现了另外一个ApplicationListener监听器，监听器实现方法会在服务器server启动后调用。
+ *
  * @author Dave Syer
  * @author Phillip Webb
  * @since 2.0.0
@@ -79,12 +83,17 @@ public class ServerPortInfoApplicationContextInitializer implements
 
 	@SuppressWarnings("unchecked")
 	private void setPortProperty(ConfigurableEnvironment environment, String propertyName, int port) {
+		//获取environment环境中的属性源配置集合
 		MutablePropertySources sources = environment.getPropertySources();
+		//获取集合中name为server.ports的PropertySource属性源配置
 		PropertySource<?> source = sources.get("server.ports");
 		if (source == null) {
+			//创建一个name是server.ports的字典类型属性源配置
 			source = new MapPropertySource("server.ports", new HashMap<>());
+			//将属性源配置放在最高优先级位置
 			sources.addFirst(source);
 		}
+		//将端口属性名local.server.port及本地端口号添加到environment中
 		((Map<String, Object>) source.getSource()).put(propertyName, port);
 	}
 

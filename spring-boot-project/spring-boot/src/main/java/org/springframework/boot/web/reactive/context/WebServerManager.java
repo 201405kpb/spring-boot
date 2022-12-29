@@ -53,6 +53,7 @@ class WebServerManager {
 	void start() {
 		this.handler.initializeHandler();
 		this.webServer.start();
+		//WebServer就绪之后发送事件ServletWebServerInitializedEvent（WebServerInitializedEvent），包含服务器的本地端口号
 		this.applicationContext
 			.publishEvent(new ReactiveWebServerInitializedEvent(this.webServer, this.applicationContext));
 	}
