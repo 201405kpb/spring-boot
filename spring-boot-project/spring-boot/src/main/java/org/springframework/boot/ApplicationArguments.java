@@ -29,6 +29,8 @@ public interface ApplicationArguments {
 
 	/**
 	 * Return the raw unprocessed arguments that were passed to the application.
+	 * 返回传递给应用程序的原始未处理参数
+	 *
 	 * @return the arguments
 	 */
 	String[] getSourceArgs();
@@ -36,6 +38,7 @@ public interface ApplicationArguments {
 	/**
 	 * Return the names of all option arguments. For example, if the arguments were
 	 * "--foo=bar --debug" would return the values {@code ["foo", "debug"]}.
+	 * 返回所有选项参数的名称，例如，如果参数是"--foo=bar --debug"将会返回["foo", "debug"]
 	 * @return the option names or an empty set
 	 */
 	Set<String> getOptionNames();
@@ -43,6 +46,7 @@ public interface ApplicationArguments {
 	/**
 	 * Return whether the set of option arguments parsed from the arguments contains an
 	 * option with the given name.
+	 * 返回解析后的选项参数集合中是否包含给定名称的选项
 	 * @param name the name to check
 	 * @return {@code true} if the arguments contain an option with the given name
 	 */
@@ -60,13 +64,19 @@ public interface ApplicationArguments {
 	 * return a collection having elements for each value ({@code ["bar", "baz"]})</li>
 	 * <li>if the option is not present, return {@code null}</li>
 	 * </ul>
-	 * @param name the name of the option
-	 * @return a list of option values for the given name
+	 * 返回与具有给定名称的arguments选项关联的值的集合
+	 * 如果该选项存在并且没有参数值（例如：”--foo“）,则返回一个空集合
+	 * 如果该选项存在并且只有一个值 (例如: "--foo=bar"), 则返回一个包含一个元素的集合["bar"]
+	 * 如果该选项存在并且有多个值（例如："--foo=bar --foo=baz"）,则返回一个包含每个值元素的集合["bar", "baz"]
+	 * 如果选项不存在，则返回null
+	 * @param name the name of the option 选项名称
+	 * @return a list of option values for the given name 返回选项值的集合（不存在返回null）
 	 */
 	List<String> getOptionValues(String name);
 
 	/**
 	 * Return the collection of non-option arguments parsed.
+	 * 返回已解析的非选项参数，不存在返回空集合
 	 * @return the non-option arguments or an empty list
 	 */
 	List<String> getNonOptionArgs();
