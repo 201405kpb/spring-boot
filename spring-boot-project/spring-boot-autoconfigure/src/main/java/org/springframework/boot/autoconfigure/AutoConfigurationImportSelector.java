@@ -298,10 +298,13 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 
 	private ConfigurationClassFilter getConfigurationClassFilter() {
 		if (this.configurationClassFilter == null) {
+			//获取过滤器集合
 			List<AutoConfigurationImportFilter> filters = getAutoConfigurationImportFilters();
 			for (AutoConfigurationImportFilter filter : filters) {
+				//调用过滤器的aware初始化属性方法
 				invokeAwareMethods(filter);
 			}
+			//创建配置类过滤器集合对象
 			this.configurationClassFilter = new ConfigurationClassFilter(this.beanClassLoader, filters);
 		}
 		return this.configurationClassFilter;
@@ -392,32 +395,41 @@ public class AutoConfigurationImportSelector implements DeferredImportSelector, 
 
 	private static class ConfigurationClassFilter {
 
+		//自动化配置注解原数据集合类
 		private final AutoConfigurationMetadata autoConfigurationMetadata;
 
+		//过滤器类，spring.factories配置文件中org.springframework.boot.autoconfigure.AutoConfigurationImportFilter指定的引入过滤器
 		private final List<AutoConfigurationImportFilter> filters;
 
 		ConfigurationClassFilter(ClassLoader classLoader, List<AutoConfigurationImportFilter> filters) {
+			//通过自动化配置注解元数据集合对象获取元数据集
 			this.autoConfigurationMetadata = AutoConfigurationMetadataLoader.loadMetadata(classLoader);
 			this.filters = filters;
 		}
 
+		//使用指定的过滤器将配置集合中的配置类进行过滤，不符合条件直接去掉，提升后续系统性能
 		List<String> filter(List<String> configurations) {
 			long startTime = System.nanoTime();
+			//将配置类转换为数组
 			String[] candidates = StringUtils.toStringArray(configurations);
+			//是否有需要跳过的配置类（即：不符合过滤器条件的类）
 			boolean skipped = false;
 			for (AutoConfigurationImportFilter filter : this.filters) {
 				boolean[] match = filter.match(candidates, this.autoConfigurationMetadata);
 				for (int i = 0; i < match.length; i++) {
+					//如果有不匹配的配置类将数组中的值置为null,skipped属性赋值为true
 					if (!match[i]) {
 						candidates[i] = null;
 						skipped = true;
 					}
 				}
 			}
+			//如果没有需要跳过的配置类（配置类都通过了过滤器条件），则直接返回
 			if (!skipped) {
 				return configurations;
 			}
 			List<String> result = new ArrayList<>(candidates.length);
+			//去除掉数组中值为null的数据
 			for (String candidate : candidates) {
 				if (candidate != null) {
 					result.add(candidate);

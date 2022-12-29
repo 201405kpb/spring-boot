@@ -33,11 +33,13 @@ import java.util.Set;
  */
 final class AutoConfigurationMetadataLoader {
 
+	//自动化配置元数据配置文件
 	protected static final String PATH = "META-INF/spring-autoconfigure-metadata.properties";
 
 	private AutoConfigurationMetadataLoader() {
 	}
 
+	// 加载元数据
 	static AutoConfigurationMetadata loadMetadata(ClassLoader classLoader) {
 		return loadMetadata(classLoader, PATH);
 	}
@@ -71,42 +73,50 @@ final class AutoConfigurationMetadataLoader {
 
 		private final Properties properties;
 
+		//Properties属性对象作为构造函数的参数
 		PropertiesAutoConfigurationMetadata(Properties properties) {
 			this.properties = properties;
 		}
 
+		//如果properties对象中包含指定的类，则返回true
 		@Override
 		public boolean wasProcessed(String className) {
 			return this.properties.containsKey(className);
 		}
 
+		//获取Integer类型的元数据
 		@Override
 		public Integer getInteger(String className, String key) {
 			return getInteger(className, key, null);
 		}
 
+		//获取Integer类型的元数据
 		@Override
 		public Integer getInteger(String className, String key, Integer defaultValue) {
 			String value = get(className, key);
 			return (value != null) ? Integer.valueOf(value) : defaultValue;
 		}
 
+		//根据类名及key获取自动化配置类元数据集合
 		@Override
 		public Set<String> getSet(String className, String key) {
 			return getSet(className, key, null);
 		}
 
+		//根据类名及key获取自动化配置类元数据集合
 		@Override
 		public Set<String> getSet(String className, String key, Set<String> defaultValue) {
 			String value = get(className, key);
 			return (value != null) ? StringUtils.commaDelimitedListToSet(value) : defaultValue;
 		}
 
+		//根据类名及key获取自动化配置类的元数据
 		@Override
 		public String get(String className, String key) {
 			return get(className, key, null);
 		}
 
+		//根据类名及key获取自动化配置类的元数据
 		@Override
 		public String get(String className, String key, String defaultValue) {
 			String value = this.properties.getProperty(className + "." + key);
