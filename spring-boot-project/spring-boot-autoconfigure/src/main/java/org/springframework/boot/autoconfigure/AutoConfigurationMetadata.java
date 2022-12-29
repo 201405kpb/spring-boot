@@ -28,7 +28,9 @@ public interface AutoConfigurationMetadata {
 
 	/**
 	 * Return {@code true} if the specified class name was processed by the annotation
+	 * 如果指定的类名由注解处理器处理过，则返回true
 	 * processor.
+	 *
 	 * @param className the source class
 	 * @return if the class was processed
 	 */
@@ -36,6 +38,7 @@ public interface AutoConfigurationMetadata {
 
 	/**
 	 * Get an {@link Integer} value from the meta-data.
+	 * 从元数据中获取Integer值
 	 * @param className the source class
 	 * @param key the meta-data key
 	 * @return the meta-data value or {@code null}
@@ -44,6 +47,7 @@ public interface AutoConfigurationMetadata {
 
 	/**
 	 * Get an {@link Integer} value from the meta-data.
+	 * 从元数据中获取Integer值
 	 * @param className the source class
 	 * @param key the meta-data key
 	 * @param defaultValue the default value
@@ -53,6 +57,7 @@ public interface AutoConfigurationMetadata {
 
 	/**
 	 * Get a {@link Set} value from the meta-data.
+	 * 从元数据中获取Set集合值
 	 * @param className the source class
 	 * @param key the meta-data key
 	 * @return the meta-data value or {@code null}
@@ -61,6 +66,7 @@ public interface AutoConfigurationMetadata {
 
 	/**
 	 * Get a {@link Set} value from the meta-data.
+	 * 从元数据中获取Set集合值
 	 * @param className the source class
 	 * @param key the meta-data key
 	 * @param defaultValue the default value
@@ -70,6 +76,7 @@ public interface AutoConfigurationMetadata {
 
 	/**
 	 * Get an {@link String} value from the meta-data.
+	 * 从原数据中获取字符串值
 	 * @param className the source class
 	 * @param key the meta-data key
 	 * @return the meta-data value or {@code null}
@@ -78,6 +85,7 @@ public interface AutoConfigurationMetadata {
 
 	/**
 	 * Get an {@link String} value from the meta-data.
+	 * 从原数据中获取字符串值
 	 * @param className the source class
 	 * @param key the meta-data key
 	 * @param defaultValue the default value
