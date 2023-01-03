@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Import;
 
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for initializing an SQL database.
+ * 初始化数据库配置类
  *
  * @author Andy Wilkinson
  * @since 2.5.0
