@@ -50,7 +50,9 @@ import javax.sql.XADataSource;
 public class DataSourceAutoConfiguration {
 
 	@Configuration(proxyBeanMethods = false)
+	//判断是否引入 内置数据库：H2，DERBY，HSQL
 	@Conditional(EmbeddedDatabaseCondition.class)
+	//如果这是没有DataSource/XADataSource 对应的 BeanDefinition，就通过导入 EmbeddedDataSourceConfiguration.class 来，配置内置数据库对应的数据源！！
 	@ConditionalOnMissingBean({ DataSource.class, XADataSource.class })
 	@Import(EmbeddedDataSourceConfiguration.class)
 	protected static class EmbeddedDatabaseConfiguration {
@@ -58,11 +60,14 @@ public class DataSourceAutoConfiguration {
 	}
 
 	@Configuration(proxyBeanMethods = false)
+	//判断是否引入依赖的数据源：HikariDataSource、tomcat.jdbc.pool.DataSource、BasicDataSource
 	@Conditional(PooledDataSourceCondition.class)
-	@ConditionalOnMissingBean({ DataSource.class, XADataSource.class })
-	@Import({ DataSourceConfiguration.Hikari.class, DataSourceConfiguration.Tomcat.class,
+	//如果这是没有DataSource/XADataSource 对应的 BeanDefinition，就通过以下属性的配置文件，配置数据源！！
+	//配置数据源的时候，如果没有指定一些数据库的参数，就会报错哦
+	@ConditionalOnMissingBean({DataSource.class, XADataSource.class})
+	@Import({DataSourceConfiguration.Hikari.class, DataSourceConfiguration.Tomcat.class,
 			DataSourceConfiguration.Dbcp2.class, DataSourceConfiguration.OracleUcp.class,
-			DataSourceConfiguration.Generic.class, DataSourceJmxConfiguration.class })
+			DataSourceConfiguration.Generic.class, DataSourceJmxConfiguration.class})
 	protected static class PooledDataSourceConfiguration {
 
 	}
@@ -109,6 +114,7 @@ public class DataSourceAutoConfiguration {
 	 * {@link Condition} to detect when an embedded {@link DataSource} type can be used.
 	 * If a pooled {@link DataSource} is available, it will always be preferred to an
 	 * {@code EmbeddedDatabase}.
+	 *
 	 */
 	static class EmbeddedDatabaseCondition extends SpringBootCondition {
 

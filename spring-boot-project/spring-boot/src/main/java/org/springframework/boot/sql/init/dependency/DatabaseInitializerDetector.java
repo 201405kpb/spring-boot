@@ -16,12 +16,11 @@
 
 package org.springframework.boot.sql.init.dependency;
 
-import java.util.Set;
-
-import javax.sql.DataSource;
-
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.Ordered;
+
+import javax.sql.DataSource;
+import java.util.Set;
 
 /**
  * Detects beans that initialize an SQL database. Implementations should be registered in
@@ -36,6 +35,8 @@ public interface DatabaseInitializerDetector extends Ordered {
 	/**
 	 * Detect beans defined in the given {@code beanFactory} that initialize a
 	 * {@link DataSource}.
+	 * 检测在给定的 beanFactory中定义的初始化 DataSource的bean。
+	 *
 	 * @param beanFactory bean factory to examine
 	 * @return names of the detected {@code DataSource} initializer beans, or an empty set
 	 * if none were detected.

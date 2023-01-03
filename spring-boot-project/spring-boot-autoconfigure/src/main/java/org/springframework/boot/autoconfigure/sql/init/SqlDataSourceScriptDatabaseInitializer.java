@@ -16,11 +16,11 @@
 
 package org.springframework.boot.autoconfigure.sql.init;
 
-import javax.sql.DataSource;
-
 import org.springframework.boot.jdbc.init.DataSourceScriptDatabaseInitializer;
 import org.springframework.boot.sql.init.DatabaseInitializationSettings;
 import org.springframework.context.annotation.ImportRuntimeHints;
+
+import javax.sql.DataSource;
 
 /**
  * {@link DataSourceScriptDatabaseInitializer} for the primary SQL database. May be
@@ -35,6 +35,8 @@ public class SqlDataSourceScriptDatabaseInitializer extends DataSourceScriptData
 
 	/**
 	 * Create a new {@link SqlDataSourceScriptDatabaseInitializer} instance.
+	 * 创建一个 SqlDataSourceScriptDatabaseInitializer 实例
+	 *
 	 * @param dataSource the primary SQL data source
 	 * @param properties the SQL initialization properties
 	 * @see #getSettings
@@ -45,6 +47,7 @@ public class SqlDataSourceScriptDatabaseInitializer extends DataSourceScriptData
 
 	/**
 	 * Create a new {@link SqlDataSourceScriptDatabaseInitializer} instance.
+	 * 创建一个 SqlDataSourceScriptDatabaseInitializer 实例
 	 * @param dataSource the primary SQL data source
 	 * @param settings the database initialization settings
 	 * @see #getSettings
