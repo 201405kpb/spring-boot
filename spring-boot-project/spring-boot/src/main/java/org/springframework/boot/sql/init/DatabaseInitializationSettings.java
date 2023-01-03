@@ -21,6 +21,7 @@ import java.util.List;
 
 /**
  * Settings for initializing an SQL database.
+ * 初始化SQL数据库的设置
  *
  * @author Andy Wilkinson
  * @since 2.5.0
@@ -41,6 +42,8 @@ public class DatabaseInitializationSettings {
 
 	/**
 	 * Returns the locations of the schema (DDL) scripts to apply to the database.
+	 * 应用于数据库的架构（DDL）脚本的位置。
+	 *
 	 * @return the locations of the schema scripts
 	 */
 	public List<String> getSchemaLocations() {
@@ -51,6 +54,8 @@ public class DatabaseInitializationSettings {
 	 * Sets the locations of schema (DDL) scripts to apply to the database. By default,
 	 * initialization will fail if a location does not exist. To prevent a failure, a
 	 * location can be made optional by prefixing it with {@code optional:}.
+	 * 设置要应用于数据库的架构（DDL）脚本的位置。默认情况下，如果位置不存在，初始化将失败。
+	 * 为了防止失败，可以通过在位置前面加上｛optional:｝来使位置成为可选的。
 	 * @param schemaLocations locations of the schema scripts
 	 */
 	public void setSchemaLocations(List<String> schemaLocations) {

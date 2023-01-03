@@ -16,14 +16,6 @@
 
 package org.springframework.boot.sql.init;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.Resource;
@@ -31,6 +23,10 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternUtils;
 import org.springframework.util.CollectionUtils;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.util.*;
 
 /**
  * Base class for an {@link InitializingBean} that performs SQL database initialization
@@ -70,6 +66,7 @@ public abstract class AbstractScriptDatabaseInitializer implements ResourceLoade
 	 * Initializes the database by applying schema and data scripts.
 	 * @return {@code true} if one or more scripts were applied to the database, otherwise
 	 * {@code false}
+	 * 通过应用架构和数据脚本初始化数据库。 返回值: 如果一个或多个脚本应用于数据库，则为true，否则为false
 	 */
 	public boolean initializeDatabase() {
 		ScriptLocationResolver locationResolver = new ScriptLocationResolver(this.resourceLoader);

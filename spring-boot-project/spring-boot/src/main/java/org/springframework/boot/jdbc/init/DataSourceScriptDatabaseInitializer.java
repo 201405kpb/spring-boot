@@ -16,11 +16,8 @@
 
 package org.springframework.boot.jdbc.init;
 
-import javax.sql.DataSource;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.sql.init.AbstractScriptDatabaseInitializer;
@@ -29,9 +26,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 
+import javax.sql.DataSource;
+
 /**
  * {@link InitializingBean} that performs {@link DataSource} initialization using schema
  * (DDL) and data (DML) scripts.
+ * 使用模式（DDL）和数据（DML）脚本执行数据库的初始化
  *
  * @author Andy Wilkinson
  * @since 2.5.0

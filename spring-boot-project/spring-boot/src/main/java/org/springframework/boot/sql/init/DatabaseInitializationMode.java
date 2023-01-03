@@ -18,25 +18,29 @@ package org.springframework.boot.sql.init;
 
 /**
  * Supported database initialization modes.
+ * 支持的数据库初始化模式
  *
  * @author Andy Wilkinson
- * @since 2.5.1
  * @see AbstractScriptDatabaseInitializer
+ * @since 2.5.1
  */
 public enum DatabaseInitializationMode {
 
 	/**
 	 * Always initialize the database.
+	 * 初始化全部数据库
 	 */
 	ALWAYS,
 
 	/**
 	 * Only initialize an embedded database.
+	 * 初始化嵌入资源数据库
 	 */
 	EMBEDDED,
 
 	/**
 	 * Never initialize the database.
+	 * 从不初始化数据库
 	 */
 	NEVER
 

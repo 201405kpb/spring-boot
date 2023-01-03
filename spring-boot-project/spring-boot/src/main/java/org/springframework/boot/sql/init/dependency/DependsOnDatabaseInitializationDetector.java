@@ -16,14 +16,16 @@
 
 package org.springframework.boot.sql.init.dependency;
 
-import java.util.Set;
-
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+
+import java.util.Set;
 
 /**
  * Detects beans that depend on database initialization. Implementations should be
  * registered in {@code META-INF/spring.factories} under the key
  * {@code org.springframework.boot.sql.init.dependency.DependsOnDatabaseInitializationDetector}.
+ * <p>
+ * 检测依赖于数据库初始化的bean
  *
  * @author Andy Wilkinson
  * @since 2.5.0

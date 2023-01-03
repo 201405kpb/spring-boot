@@ -18,7 +18,6 @@ package org.springframework.boot.autoconfigure.validation;
 
 import jakarta.validation.Validator;
 import jakarta.validation.executable.ExecutableValidator;
-
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -52,11 +51,16 @@ import org.springframework.validation.beanvalidation.MethodValidationPostProcess
 @Import(PrimaryDefaultValidatorPostProcessor.class)
 public class ValidationAutoConfiguration {
 
+	/**
+	 * 向容器注册一个 bean LocalValidatorFactoryBean defaultValidator,
+	 * 仅在容器中不存在类型为 Validator 的 bean时才注册该bean定义
+	 * 这是Spring 框架各部分缺省使用的 validator , 基于对象属性上的验证注解验证对象属性值
+	 */
 	@Bean
 	@Role(BeanDefinition.ROLE_INFRASTRUCTURE)
 	@ConditionalOnMissingBean(Validator.class)
 	public static LocalValidatorFactoryBean defaultValidator(ApplicationContext applicationContext,
-			ObjectProvider<ValidationConfigurationCustomizer> customizers) {
+															 ObjectProvider<ValidationConfigurationCustomizer> customizers) {
 		LocalValidatorFactoryBean factoryBean = new LocalValidatorFactoryBean();
 		factoryBean.setConfigurationInitializer((configuration) -> customizers.orderedStream()
 				.forEach((customizer) -> customizer.customize(configuration)));
@@ -65,10 +69,16 @@ public class ValidationAutoConfiguration {
 		return factoryBean;
 	}
 
+
+	// 向容器注册一个 bean MethodValidationPostProcessor methodValidationPostProcessor
+	// 这是一个 BeanPostProcessor, 它基于容器中存在的 bean Validator构建一个 MethodValidationInterceptor，
+	// 这是一个方法调用拦截器，然后该 BeanPostProcessor 会为那些使用了注解 @Validated 的 bean
+	// 创建代理对象，并使用所创建的 MethodValidationInterceptor 包裹该 bean，从而能够在方法调用时
+	// 对 bean 的方法参数进行验证
 	@Bean
 	@ConditionalOnMissingBean(search = SearchStrategy.CURRENT)
 	public static MethodValidationPostProcessor methodValidationPostProcessor(Environment environment,
-			ObjectProvider<Validator> validator, ObjectProvider<MethodValidationExcludeFilter> excludeFilters) {
+																			  ObjectProvider<Validator> validator, ObjectProvider<MethodValidationExcludeFilter> excludeFilters) {
 		FilteredMethodValidationPostProcessor processor = new FilteredMethodValidationPostProcessor(
 				excludeFilters.orderedStream());
 		boolean proxyTargetClass = environment.getProperty("spring.aop.proxy-target-class", Boolean.class, true);

@@ -16,15 +16,16 @@
 
 package org.springframework.boot.sql.init.dependency;
 
+import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.ListableBeanFactory;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.springframework.beans.factory.BeanFactoryUtils;
-import org.springframework.beans.factory.ListableBeanFactory;
-
 /**
  * Helper class for detecting beans of particular types in a bean factory.
+ * 用于检测bean工厂中特定类型的bean的Helper类。
  *
  * @author Andy Wilkinson
  */
