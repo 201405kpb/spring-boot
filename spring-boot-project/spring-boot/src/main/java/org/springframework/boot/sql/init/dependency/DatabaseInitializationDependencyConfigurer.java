@@ -16,16 +16,6 @@
 
 package org.springframework.boot.sql.init.dependency;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.springframework.aot.AotDetector;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -44,6 +34,8 @@ import org.springframework.core.io.support.SpringFactoriesLoader.ArgumentResolve
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+
+import java.util.*;
 
 /**
  * Configures beans that depend upon SQL database initialization with
@@ -68,6 +60,7 @@ public class DatabaseInitializationDependencyConfigurer implements ImportBeanDef
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
 		String name = DependsOnDatabaseInitializationPostProcessor.class.getName();
+		// 若DependsOnDatabaseInitializationPostProcessor 在工厂中不存在，则注册DependsOnDatabaseInitializationPostProcessor BeanDefinition
 		if (!registry.containsBeanDefinition(name)) {
 			BeanDefinitionBuilder builder = BeanDefinitionBuilder
 				.rootBeanDefinition(DependsOnDatabaseInitializationPostProcessor.class);
@@ -78,6 +71,7 @@ public class DatabaseInitializationDependencyConfigurer implements ImportBeanDef
 	/**
 	 * {@link BeanFactoryPostProcessor} used to configure database initialization
 	 * dependency relationships.
+	 * BeanFactoryPostProcessor 用于配置数据库初始化依赖关系
 	 */
 	static class DependsOnDatabaseInitializationPostProcessor
 			implements BeanFactoryPostProcessor, EnvironmentAware, Ordered {
@@ -99,11 +93,13 @@ public class DatabaseInitializationDependencyConfigurer implements ImportBeanDef
 			if (AotDetector.useGeneratedArtifacts()) {
 				return;
 			}
+
 			InitializerBeanNames initializerBeanNames = detectInitializerBeanNames(beanFactory);
 			if (initializerBeanNames.isEmpty()) {
 				return;
 			}
 			Set<String> previousInitializerBeanNamesBatch = null;
+			//遍历处理初始化Bean
 			for (Set<String> initializerBeanNamesBatch : initializerBeanNames.batchedBeanNames()) {
 				for (String initializerBeanName : initializerBeanNamesBatch) {
 					BeanDefinition beanDefinition = getBeanDefinition(initializerBeanName, beanFactory);
@@ -112,12 +108,20 @@ public class DatabaseInitializationDependencyConfigurer implements ImportBeanDef
 				}
 				previousInitializerBeanNamesBatch = initializerBeanNamesBatch;
 			}
+			// 遍历处理依赖Bean
 			for (String dependsOnInitializationBeanNames : detectDependsOnInitializationBeanNames(beanFactory)) {
 				BeanDefinition beanDefinition = getBeanDefinition(dependsOnInitializationBeanNames, beanFactory);
 				beanDefinition.setDependsOn(merge(beanDefinition.getDependsOn(), initializerBeanNames.beanNames()));
 			}
 		}
 
+		/**
+		 * 合并依赖
+		 *
+		 * @param source     数据源
+		 * @param additional 补充的
+		 * @return 字符串数组
+		 */
 		private String[] merge(String[] source, Set<String> additional) {
 			if (CollectionUtils.isEmpty(additional)) {
 				return source;
@@ -127,6 +131,12 @@ public class DatabaseInitializationDependencyConfigurer implements ImportBeanDef
 			return StringUtils.toStringArray(result);
 		}
 
+		/**
+		 * 检查初始化Bean 名称
+		 *
+		 * @param beanFactory spring 容器
+		 * @return 初始化Bean 名称
+		 */
 		private InitializerBeanNames detectInitializerBeanNames(ConfigurableListableBeanFactory beanFactory) {
 			List<DatabaseInitializerDetector> detectors = getDetectors(beanFactory, DatabaseInitializerDetector.class);
 			InitializerBeanNames initializerBeanNames = new InitializerBeanNames();
@@ -144,6 +154,12 @@ public class DatabaseInitializationDependencyConfigurer implements ImportBeanDef
 			return initializerBeanNames;
 		}
 
+		/**
+		 * 检测DependsOn初始化Bean名称
+		 *
+		 * @param beanFactory spring 容器
+		 * @return
+		 */
 		private Collection<String> detectDependsOnInitializationBeanNames(ConfigurableListableBeanFactory beanFactory) {
 			List<DependsOnDatabaseInitializationDetector> detectors = getDetectors(beanFactory,
 					DependsOnDatabaseInitializationDetector.class);
@@ -154,17 +170,30 @@ public class DatabaseInitializationDependencyConfigurer implements ImportBeanDef
 			return beanNames;
 		}
 
+		/**
+		 * 从spring.factories中 加载指定类型的实例
+		 *
+		 * @param beanFactory spring beanFactory 容器
+		 * @param type        类型
+		 * @return
+		 */
 		private <T> List<T> getDetectors(ConfigurableListableBeanFactory beanFactory, Class<T> type) {
 			ArgumentResolver argumentResolver = ArgumentResolver.of(Environment.class, this.environment);
 			return SpringFactoriesLoader.forDefaultResourceLocation(beanFactory.getBeanClassLoader())
 				.load(type, argumentResolver);
 		}
 
+		/**
+		 * 从 beanFactory 中获取 名称为 beanName 的 BeanDefinition
+		 *
+		 * @param beanName    bean 名称
+		 * @param beanFactory bean 工厂
+		 * @return
+		 */
 		private static BeanDefinition getBeanDefinition(String beanName, ConfigurableListableBeanFactory beanFactory) {
 			try {
 				return beanFactory.getBeanDefinition(beanName);
-			}
-			catch (NoSuchBeanDefinitionException ex) {
+			} catch (NoSuchBeanDefinitionException ex) {
 				BeanFactory parentBeanFactory = beanFactory.getParentBeanFactory();
 				if (parentBeanFactory instanceof ConfigurableListableBeanFactory configurableBeanFactory) {
 					return getBeanDefinition(beanName, configurableBeanFactory);
@@ -180,6 +209,7 @@ public class DatabaseInitializationDependencyConfigurer implements ImportBeanDef
 			private final Set<String> beanNames = new LinkedHashSet<>();
 
 			private void detected(DatabaseInitializerDetector detector, String beanName) {
+				//如果存在则处理value的数据，如果不存在，则创建一个满足value要求的数据结构放到value中
 				this.byDetectorBeanNames.computeIfAbsent(detector, (key) -> new LinkedHashSet<>()).add(beanName);
 				this.beanNames.add(beanName);
 			}

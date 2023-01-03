@@ -16,15 +16,17 @@
 
 package org.springframework.boot.sql.init.dependency;
 
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+
 import java.util.Collections;
 import java.util.Set;
-
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 
 /**
  * Base class for {@link DependsOnDatabaseInitializationDetector
  * DependsOnDatabaseInitializationDetectors} that detect by type beans that depend upon
  * database initialization.
+ * <p>
+ * DependsDatabaseInitializationInspectors 的基类，该基类通过依赖于数据库初始化的类型bean进行检测。
  *
  * @author Andy Wilkinson
  * @since 2.5.0
@@ -46,6 +48,7 @@ public abstract class AbstractBeansOfTypeDependsOnDatabaseInitializationDetector
 	/**
 	 * Returns the bean types that should be detected as depending on database
 	 * initialization.
+	 * 根据数据库初始化检测的bean类型。
 	 * @return the database initialization dependent bean types
 	 */
 	protected abstract Set<Class<?>> getDependsOnDatabaseInitializationBeanTypes();

@@ -16,14 +16,16 @@
 
 package org.springframework.boot.autoconfigure.sql.init;
 
+import org.springframework.boot.sql.init.DatabaseInitializationSettings;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.springframework.boot.sql.init.DatabaseInitializationSettings;
 
 /**
  * Helpers class for creating {@link DatabaseInitializationSettings} from
  * {@link SqlInitializationProperties}.
+ * <p>
+ * 用于从 SqlInitializationProperties 创建 DatabaseInitializationSettings的帮助程序类。
  *
  * @author Andy Wilkinson
  */
@@ -32,6 +34,11 @@ final class SettingsCreator {
 	private SettingsCreator() {
 	}
 
+	/**
+	 * 从配置文件中创建 DatabaseInitializationSettings 对象
+	 * @param properties
+	 * @return
+	 */
 	static DatabaseInitializationSettings createFrom(SqlInitializationProperties properties) {
 		DatabaseInitializationSettings settings = new DatabaseInitializationSettings();
 		settings
