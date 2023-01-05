@@ -37,6 +37,8 @@ public @interface ConditionalOnResource {
 
 	/**
 	 * The resources that must be present.
+	 * 指定的资源必须存在,否则返回不匹配
+	 *
 	 * @return the resource paths that must be present.
 	 */
 	String[] resources() default {};

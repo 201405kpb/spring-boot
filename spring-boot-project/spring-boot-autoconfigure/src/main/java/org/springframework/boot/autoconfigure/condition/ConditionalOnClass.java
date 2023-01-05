@@ -68,12 +68,15 @@ public @interface ConditionalOnClass {
 	 * classpath, only if this annotation is directly on the affected component and
 	 * <b>not</b> if this annotation is used as a composed, meta-annotation. In order to
 	 * use this annotation as a meta-annotation, only use the {@link #name} attribute.
+	 * 给定类的类型
+	 *
 	 * @return the classes that must be present
 	 */
 	Class<?>[] value() default {};
 
 	/**
 	 * The classes names that must be present.
+	 * 给定类名称
 	 * @return the class names that must be present.
 	 */
 	String[] name() default {};

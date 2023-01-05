@@ -49,9 +49,11 @@ public @interface ConditionalOnSingleCandidate {
 	 * The class type of bean that should be checked. The condition matches if a bean of
 	 * the class specified is contained in the {@link BeanFactory} and a primary candidate
 	 * exists in case of multiple instances.
+	 * bean的类型,当ApplicationContext包含给定类的bean时并且如果有多个该类型的bean并且指定为primary的存在则返回true.
 	 * <p>
 	 * This attribute may <strong>not</strong> be used in conjunction with
 	 * {@link #type()}, but it may be used instead of {@link #type()}.
+	 *
 	 * @return the class type of the bean to check
 	 */
 	Class<?> value() default Object.class;
@@ -60,6 +62,7 @@ public @interface ConditionalOnSingleCandidate {
 	 * The class type name of bean that should be checked. The condition matches if a bean
 	 * of the class specified is contained in the {@link BeanFactory} and a primary
 	 * candidate exists in case of multiple instances.
+	 * bean的类型名,当ApplicationContext包含给定的id并且如果有多个该类型的bean并且指定为primary的存在则返回true.
 	 * <p>
 	 * This attribute may <strong>not</strong> be used in conjunction with
 	 * {@link #value()}, but it may be used instead of {@link #value()}.
@@ -68,8 +71,8 @@ public @interface ConditionalOnSingleCandidate {
 	String type() default "";
 
 	/**
-	 * Strategy to decide if the application context hierarchy (parent contexts) should be
-	 * considered.
+	 * Strategy to decide if the application context hierarchy (parent contexts) should be considered.
+	 * 搜索策略，默认是所有上下文搜索
 	 * @return the search strategy
 	 */
 	SearchStrategy search() default SearchStrategy.ALL;
