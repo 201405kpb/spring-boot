@@ -39,6 +39,8 @@ public @interface ConditionalOnJndi {
 	/**
 	 * JNDI Locations, one of which must exist. If no locations are specific the condition
 	 * matches solely based on the presence of an {@link InitialContext}.
+	 * 给定的jndi的Location 必须存在一个.否则,返回不匹配
+	 *
 	 * @return the JNDI locations
 	 */
 	String[] value() default {};

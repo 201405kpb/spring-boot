@@ -64,6 +64,8 @@ public @interface ConditionalOnMissingBean {
 	/**
 	 * The class types of beans that should be checked. The condition matches when no bean
 	 * of each class specified is contained in the {@link BeanFactory}.
+	 * bean的类型,当ApplicationContext不包含给定类的bean时返回true
+	 *
 	 * @return the class types of beans to check
 	 */
 	Class<?>[] value() default {};
@@ -71,20 +73,22 @@ public @interface ConditionalOnMissingBean {
 	/**
 	 * The class type names of beans that should be checked. The condition matches when no
 	 * bean of each class specified is contained in the {@link BeanFactory}.
+	 * bean的类型名,当ApplicationContext不包含给定的id时返回true
 	 * @return the class type names of beans to check
 	 */
 	String[] type() default {};
 
 	/**
 	 * The class types of beans that should be ignored when identifying matching beans.
+	 * 给定的类型当进行匹配时进行忽略
 	 * @return the class types of beans to ignore
 	 * @since 1.2.5
 	 */
 	Class<?>[] ignored() default {};
 
 	/**
-	 * The class type names of beans that should be ignored when identifying matching
-	 * beans.
+	 * The class type names of beans that should be ignored when identifying matching beans.
+	 * 给定的类型名当进行匹配时进行忽略
 	 * @return the class type names of beans to ignore
 	 * @since 1.2.5
 	 */
@@ -94,6 +98,7 @@ public @interface ConditionalOnMissingBean {
 	 * The annotation type decorating a bean that should be checked. The condition matches
 	 * when each annotation specified is missing from all beans in the
 	 * {@link BeanFactory}.
+	 * bean所声明的注解,当ApplicationContext中不存在声明该注解的bean时返回true
 	 * @return the class-level annotation types to check
 	 */
 	Class<? extends Annotation>[] annotation() default {};
@@ -101,6 +106,7 @@ public @interface ConditionalOnMissingBean {
 	/**
 	 * The names of beans to check. The condition matches when each bean name specified is
 	 * missing in the {@link BeanFactory}.
+	 * bean的id,,当ApplicationContext中不存在给定id的bean时返回true
 	 * @return the names of beans to check
 	 */
 	String[] name() default {};
@@ -108,6 +114,7 @@ public @interface ConditionalOnMissingBean {
 	/**
 	 * Strategy to decide if the application context hierarchy (parent contexts) should be
 	 * considered.
+	 * 搜索策略，默认是所有上下文搜索
 	 * @return the search strategy
 	 */
 	SearchStrategy search() default SearchStrategy.ALL;
@@ -117,6 +124,7 @@ public @interface ConditionalOnMissingBean {
 	 * parameters. For example, an annotation declaring {@code value=Name.class} and
 	 * {@code parameterizedContainer=NameRegistration.class} would detect both
 	 * {@code Name} and {@code NameRegistration<Name>}.
+	 * 可以在其泛型参数中包含指定bean类型的其他类
 	 * @return the container types
 	 * @since 2.1.0
 	 */
