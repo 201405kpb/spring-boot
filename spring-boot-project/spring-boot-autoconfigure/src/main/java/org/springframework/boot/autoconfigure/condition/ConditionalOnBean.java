@@ -63,6 +63,8 @@ public @interface ConditionalOnBean {
 	/**
 	 * The class types of beans that should be checked. The condition matches when beans
 	 * of all classes specified are contained in the {@link BeanFactory}.
+	 * bean的类型,当ApplicationContext包含给定类的bean时返回true
+	 *
 	 * @return the class types of beans to check
 	 */
 	Class<?>[] value() default {};
@@ -70,6 +72,7 @@ public @interface ConditionalOnBean {
 	/**
 	 * The class type names of beans that should be checked. The condition matches when
 	 * beans of all classes specified are contained in the {@link BeanFactory}.
+	 * bean的类型名,当ApplicationContext包含给定的id时返回true
 	 * @return the class type names of beans to check
 	 */
 	String[] type() default {};
@@ -77,6 +80,7 @@ public @interface ConditionalOnBean {
 	/**
 	 * The annotation type decorating a bean that should be checked. The condition matches
 	 * when all the annotations specified are defined on beans in the {@link BeanFactory}.
+	 * bean所声明的注解,当ApplicationContext中存在声明该注解的bean时返回true
 	 * @return the class-level annotation types to check
 	 */
 	Class<? extends Annotation>[] annotation() default {};
@@ -84,6 +88,7 @@ public @interface ConditionalOnBean {
 	/**
 	 * The names of beans to check. The condition matches when all the bean names
 	 * specified are contained in the {@link BeanFactory}.
+	 * bean的id,,当ApplicationContext中存在给定id的bean时返回true
 	 * @return the names of beans to check
 	 */
 	String[] name() default {};
@@ -91,6 +96,7 @@ public @interface ConditionalOnBean {
 	/**
 	 * Strategy to decide if the application context hierarchy (parent contexts) should be
 	 * considered.
+	 * 搜索策略，默认是所有上下文搜索
 	 * @return the search strategy
 	 */
 	SearchStrategy search() default SearchStrategy.ALL;
@@ -100,6 +106,9 @@ public @interface ConditionalOnBean {
 	 * parameters. For example, an annotation declaring {@code value=Name.class} and
 	 * {@code parameterizedContainer=NameRegistration.class} would detect both
 	 * {@code Name} and {@code NameRegistration<Name>}.
+	 * 指定 bean 类的类型：泛型类
+	 * 匹配规则：存在某个 bean 为 A ，A 的类型和 parameterizedContainer 指定的泛型类的类型一致（可以是它的实现类或继承子类），
+	 * 且 A 的泛型参数是 @ConditionalOnBean 注解的 bean 的类型
 	 * @return the container types
 	 * @since 2.1.0
 	 */

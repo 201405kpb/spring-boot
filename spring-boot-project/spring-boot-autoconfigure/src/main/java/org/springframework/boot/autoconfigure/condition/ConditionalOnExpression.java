@@ -42,6 +42,8 @@ public @interface ConditionalOnExpression {
 	/**
 	 * The SpEL expression to evaluate. Expression should return {@code true} if the
 	 * condition passes or {@code false} if it fails.
+	 * 如果该表达式返回true则代表匹配,否则返回不匹配
+	 *
 	 * @return the SpEL expression
 	 */
 	String value() default "true";

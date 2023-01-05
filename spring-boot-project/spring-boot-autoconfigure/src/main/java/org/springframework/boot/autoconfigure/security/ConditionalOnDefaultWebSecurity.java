@@ -16,17 +16,15 @@
 
 package org.springframework.boot.autoconfigure.security;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.context.annotation.Conditional;
+
+import java.lang.annotation.*;
 
 /**
  * {@link Conditional @Conditional} that only matches when web security is available and
  * the user has not defined their own configuration.
+ * <p>
+ * 仅在 web security可用且用户尚未定义自己的配置时匹配。
  *
  * @author Phillip Webb
  * @since 2.4.0

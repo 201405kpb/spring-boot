@@ -16,14 +16,15 @@
 
 package org.springframework.boot.autoconfigure.condition;
 
+import org.springframework.context.annotation.Condition;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.springframework.context.annotation.Condition;
 
 /**
  * {@link Condition} that will match when none of the nested class conditions match. Can
  * be used to create composite conditions, for example:
+ * 满足其中任意一个条件都会不会加载bean
  *
  * <pre class="code">
  * static class OnNeitherJndiNorProperty extends NoneNestedConditions {
@@ -60,6 +61,7 @@ public abstract class NoneNestedConditions extends AbstractNestedCondition {
 
 	@Override
 	protected ConditionOutcome getFinalMatchOutcome(MemberMatchOutcomes memberOutcomes) {
+		//没有满足条件的成员成果
 		boolean match = memberOutcomes.getMatches().isEmpty();
 		List<ConditionMessage> messages = new ArrayList<>();
 		messages.add(ConditionMessage.forCondition("NoneNestedConditions").because(
