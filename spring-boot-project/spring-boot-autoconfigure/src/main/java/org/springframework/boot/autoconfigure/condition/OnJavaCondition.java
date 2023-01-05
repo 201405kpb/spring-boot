@@ -57,9 +57,11 @@ class OnJavaCondition extends SpringBootCondition {
 
 	/**
 	 * Determines if the {@code runningVersion} is within the specified range of versions.
+	 * 判断给定的JavaVersion是否包含当前所对应的JavaVersion
+	 *
 	 * @param runningVersion the current version.
-	 * @param range the range
-	 * @param version the bounds of the range
+	 * @param range          the range
+	 * @param version        the bounds of the range
 	 * @return if this version is within the specified range
 	 */
 	private boolean isWithin(JavaVersion runningVersion, Range range, JavaVersion version) {

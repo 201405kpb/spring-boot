@@ -16,14 +16,14 @@
 
 package org.springframework.boot.system;
 
+import org.springframework.util.ClassUtils;
+
 import java.io.Console;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
-
-import org.springframework.util.ClassUtils;
 
 /**
  * Known Java versions.
@@ -65,6 +65,8 @@ public enum JavaVersion {
 
 	/**
 	 * Returns the {@link JavaVersion} of the current runtime.
+	 * 返回spring boot 应用运行环境所对应的JavaVersion,默认为1.6
+	 *
 	 * @return the {@link JavaVersion}
 	 */
 	public static JavaVersion getJavaVersion() {

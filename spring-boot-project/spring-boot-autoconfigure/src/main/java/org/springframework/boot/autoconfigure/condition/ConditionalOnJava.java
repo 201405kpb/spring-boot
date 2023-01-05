@@ -42,6 +42,8 @@ public @interface ConditionalOnJava {
 	 * Configures whether the value configured in {@link #value()} shall be considered the
 	 * upper exclusive or lower inclusive boundary. Defaults to
 	 * {@link Range#EQUAL_OR_NEWER}.
+	 * 表明是大于等于配置的JavaVersion还是小于配置的JavaVersion
+	 *
 	 * @return the range
 	 */
 	Range range() default Range.EQUAL_OR_NEWER;
@@ -49,6 +51,7 @@ public @interface ConditionalOnJava {
 	/**
 	 * The {@link JavaVersion} to check for. Use {@link #range()} to specify whether the
 	 * configured value is an upper-exclusive or lower-inclusive boundary.
+	 * 配置要检查的java版本.使用range属性来表明大小关系
 	 * @return the java version
 	 */
 	JavaVersion value();
@@ -60,13 +63,13 @@ public @interface ConditionalOnJava {
 
 		/**
 		 * Equal to, or newer than the specified {@link JavaVersion}.
-		 * 等于或高于指定的 JavaVersion。
+		 * 大于或者等于给定的JavaVersion
 		 */
 		EQUAL_OR_NEWER,
 
 		/**
 		 * Older than the specified {@link JavaVersion}.
-		 * 早于指定的 JavaVersion
+		 * 小于指定的 JavaVersion
 		 */
 		OLDER_THAN
 

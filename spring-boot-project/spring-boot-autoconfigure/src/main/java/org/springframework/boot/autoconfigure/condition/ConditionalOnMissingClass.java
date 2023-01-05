@@ -36,6 +36,8 @@ public @interface ConditionalOnMissingClass {
 
 	/**
 	 * The names of the classes that must not be present.
+	 * 必须不存在的类的名称
+	 *
 	 * @return the names of the classes that must not be present
 	 */
 	String[] value() default {};

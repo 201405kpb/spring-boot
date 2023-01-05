@@ -16,16 +16,17 @@
 
 package org.springframework.boot.autoconfigure.condition;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.context.annotation.Condition;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * {@link Condition} that will match when any nested class condition matches. Can be used
  * to create composite conditions, for example:
+ * 满足其中任意一个条件都会加载bean
  *
  * <pre class="code">
  * static class OnJndiOrProperty extends AnyNestedCondition {
@@ -63,6 +64,7 @@ public abstract class AnyNestedCondition extends AbstractNestedCondition {
 
 	@Override
 	protected ConditionOutcome getFinalMatchOutcome(MemberMatchOutcomes memberOutcomes) {
+		// 存在符合条件的成员匹配结果
 		boolean match = !memberOutcomes.getMatches().isEmpty();
 		List<ConditionMessage> messages = new ArrayList<>();
 		messages.add(ConditionMessage.forCondition("AnyNestedCondition")
@@ -71,6 +73,7 @@ public abstract class AnyNestedCondition extends AbstractNestedCondition {
 		for (ConditionOutcome outcome : memberOutcomes.getAll()) {
 			messages.add(outcome.getConditionMessage());
 		}
+		//返回成员匹配成果
 		return new ConditionOutcome(match, ConditionMessage.of(messages));
 	}
 
