@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2021 the original author or authors.
+ * Copyright 2012-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,26 +46,20 @@ public class ConfigurationPropertiesBindingPostProcessor
 
 	/**
 	 * The bean name that this post-processor is registered with.
-	 * 后处理器的bean名称
 	 */
 	public static final String BEAN_NAME = ConfigurationPropertiesBindingPostProcessor.class.getName();
 
-	// 应用程序上下文
 	private ApplicationContext applicationContext;
 
-	//bean定义注册中心实现类
 	private BeanDefinitionRegistry registry;
 
-	//配置文件绑定实现类
 	private ConfigurationPropertiesBinder binder;
 
-	//初始化应用程序上下文属性
 	@Override
 	public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
 		this.applicationContext = applicationContext;
 	}
 
-	//初始化注册中心及binder属性值
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		// We can't use constructor injection of the application context because
@@ -79,22 +73,26 @@ public class ConfigurationPropertiesBindingPostProcessor
 		return Ordered.HIGHEST_PRECEDENCE + 1;
 	}
 
-	//bean初始化之前调用初始化方法
 	@Override
 	public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-		bind(ConfigurationPropertiesBean.get(this.applicationContext, bean, beanName));
+		if (!hasBoundValueObject(beanName)) {
+			bind(ConfigurationPropertiesBean.get(this.applicationContext, bean, beanName));
+		}
 		return bean;
 	}
 
+	private boolean hasBoundValueObject(String beanName) {
+		return this.registry.containsBeanDefinition(beanName) && BindMethod.VALUE_OBJECT
+				.equals(this.registry.getBeanDefinition(beanName).getAttribute(BindMethod.class.getName()));
+	}
+
 	private void bind(ConfigurationPropertiesBean bean) {
-		//如果bean为null,或者bean在IOC容器中并且是VALUE_OBJECT注册方式
-		if (bean == null || hasBoundValueObject(bean.getName())) {
+		if (bean == null) {
 			return;
 		}
 		Assert.state(bean.getBindMethod() == BindMethod.JAVA_BEAN, "Cannot bind @ConfigurationProperties for bean '"
 				+ bean.getName() + "'. Ensure that @ConstructorBinding has not been applied to regular bean");
 		try {
-			//bean是JAVA_BEAN绑定方式时通过递归的方式将配置文件中的属性绑定到bean对象中
 			this.binder.bind(bean);
 		}
 		catch (Exception ex) {
@@ -102,21 +100,14 @@ public class ConfigurationPropertiesBindingPostProcessor
 		}
 	}
 
-	//判定@ConfigurationProperties注解标注的类是否已经注册到IOC容器中，并且该是对象是ConfigurationPropertiesValueObjectBeanDefinition类型的实例，即：是构造函数绑定方式
-	private boolean hasBoundValueObject(String beanName) {
-		return this.registry.containsBeanDefinition(beanName) && BindMethod.VALUE_OBJECT
-				.equals(this.registry.getBeanDefinition(beanName).getAttribute(BindMethod.class.getName()));
-	}
-
 	/**
-	 * Register a {@link ConfigurationPropertiesBindingPostProcessor} bean if one is not already registered.
-	 * 如果容器中不存在ConfigurationPropertiesBindingPostProcessor对应的BeanDefinition，则将其注册到IOC容器之中，如果ConfigurationPropertiesBinder在容器中不存在也将其注册到容器之中
+	 * Register a {@link ConfigurationPropertiesBindingPostProcessor} bean if one is not
+	 * already registered.
 	 * @param registry the bean definition registry
 	 * @since 2.2.0
 	 */
 	public static void register(BeanDefinitionRegistry registry) {
 		Assert.notNull(registry, "Registry must not be null");
-		// 判断ConfigurationPropertiesBindingPostProcessor是否已经注册
 		if (!registry.containsBeanDefinition(BEAN_NAME)) {
 			BeanDefinition definition = BeanDefinitionBuilder
 					.rootBeanDefinition(ConfigurationPropertiesBindingPostProcessor.class).getBeanDefinition();
