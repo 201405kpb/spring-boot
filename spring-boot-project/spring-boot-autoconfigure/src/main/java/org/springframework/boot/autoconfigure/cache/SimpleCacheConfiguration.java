@@ -16,8 +16,6 @@
 
 package org.springframework.boot.autoconfigure.cache;
 
-import java.util.List;
-
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
@@ -25,8 +23,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
+
 /**
  * Simplest cache configuration, usually used as a fallback.
+ * 最简单的缓存配置，通常用作回退。
  *
  * @author Stephane Nicoll
  */
