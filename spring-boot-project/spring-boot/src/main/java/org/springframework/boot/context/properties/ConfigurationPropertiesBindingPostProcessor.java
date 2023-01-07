@@ -95,7 +95,7 @@ public class ConfigurationPropertiesBindingPostProcessor
 	}
 
 	private void bind(ConfigurationPropertiesBean bean) {
-		//如果bean为null
+		//如果bean为null返回
 		if (bean == null) {
 			return;
 		}
