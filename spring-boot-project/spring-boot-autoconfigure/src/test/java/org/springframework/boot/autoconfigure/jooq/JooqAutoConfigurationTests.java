@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2022 the original author or authors.
+ * Copyright 2012-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import org.jooq.DSLContext;
 import org.jooq.ExecuteListener;
 import org.jooq.ExecuteListenerProvider;
 import org.jooq.SQLDialect;
+import org.jooq.TransactionContext;
+import org.jooq.TransactionProvider;
 import org.jooq.TransactionalRunnable;
 import org.jooq.impl.DataSourceConnectionProvider;
 import org.jooq.impl.DefaultExecuteListenerProvider;
@@ -155,6 +157,16 @@ class JooqAutoConfigurationTests {
 						.isEqualTo(SQLDialect.POSTGRES));
 	}
 
+	@Test
+	void transactionProviderBacksOffOnExistingTransactionProvider() {
+		this.contextRunner
+				.withUserConfiguration(JooqDataSourceConfiguration.class, CustomTransactionProviderConfiguration.class)
+				.run((context) -> {
+					TransactionProvider transactionProvider = context.getBean(TransactionProvider.class);
+					assertThat(transactionProvider).isInstanceOf(CustomTransactionProvider.class);
+				});
+	}
+
 	static class AssertFetch implements TransactionalRunnable {
 
 		private final DSLContext dsl;
@@ -171,7 +183,7 @@ class JooqAutoConfigurationTests {
 
 		@Override
 		public void run(org.jooq.Configuration configuration) {
-			assertThat(this.dsl.fetch(this.sql).getValue(0, 0).toString()).isEqualTo(this.expected);
+			assertThat(this.dsl.fetch(this.sql).getValue(0, 0)).hasToString(this.expected);
 		}
 
 	}
@@ -207,6 +219,16 @@ class JooqAutoConfigurationTests {
 	}
 
 	@Configuration(proxyBeanMethods = false)
+	static class CustomTransactionProviderConfiguration {
+
+		@Bean
+		TransactionProvider transactionProvider() {
+			return new CustomTransactionProvider();
+		}
+
+	}
+
+	@Configuration(proxyBeanMethods = false)
 	static class TxManagerConfiguration {
 
 		@Bean
@@ -222,6 +244,25 @@ class JooqAutoConfigurationTests {
 		@Override
 		public ExecuteListener provide() {
 			return null;
+		}
+
+	}
+
+	static class CustomTransactionProvider implements TransactionProvider {
+
+		@Override
+		public void begin(TransactionContext ctx) {
+
+		}
+
+		@Override
+		public void commit(TransactionContext ctx) {
+
+		}
+
+		@Override
+		public void rollback(TransactionContext ctx) {
+
 		}
 
 	}

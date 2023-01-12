@@ -340,7 +340,7 @@ class JavaBeanBinder implements DataObjectBinder {
 
 		//初始化getter对象
 		void addGetter(Method getter) {
-			if (this.getter == null || isBetterGetter(getter)) {
+			if (this.getter == null || this.getter.getName().startsWith("is")) {
 				this.getter = getter;
 			}
 		}
