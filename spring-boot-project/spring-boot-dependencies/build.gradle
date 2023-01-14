@@ -87,7 +87,7 @@ bom {
 			]
 		}
 	}
-	library("Byte Buddy", "1.12.20") {
+	library("Byte Buddy", "1.12.21") {
 		group("net.bytebuddy") {
 			modules = [
 				"byte-buddy",
@@ -206,7 +206,7 @@ bom {
 			]
 		}
 	}
-	library("Dropwizard Metrics", "4.2.14") {
+	library("Dropwizard Metrics", "4.2.15") {
 		group("io.dropwizard.metrics") {
 			imports = [
 				"metrics-bom"
@@ -291,7 +291,7 @@ bom {
 			]
 		}
 	}
-	library("Groovy", "4.0.6") {
+	library("Groovy", "4.0.7") {
 		group("org.apache.groovy") {
 			imports = [
 				"groovy-bom"
@@ -431,7 +431,7 @@ bom {
 			]
 		}
 	}
-	library("Infinispan", "14.0.4.Final") {
+	library("Infinispan", "14.0.5.Final") {
 		group("org.infinispan") {
 			imports = [
 				"infinispan-bom"
@@ -452,7 +452,7 @@ bom {
 			]
 		}
 	}
-	library("Jakarta Activation", "2.1.0") {
+	library("Jakarta Activation", "2.1.1") {
 		group("jakarta.activation") {
 			modules = [
 				"jakarta.activation-api"
@@ -487,7 +487,7 @@ bom {
 			]
 		}
 	}
-	library("Jakarta Mail", "2.1.0") {
+	library("Jakarta Mail", "2.1.1") {
 		group("jakarta.mail") {
 			modules = [
 				"jakarta.mail-api"
@@ -707,7 +707,7 @@ bom {
 			]
 		}
 	}
-	library("JUnit Jupiter", "5.9.1") {
+	library("JUnit Jupiter", "5.9.2") {
 		group("org.junit") {
 			imports = [
 				"junit-bom"
@@ -813,7 +813,7 @@ bom {
 			]
 		}
 	}
-	library("MariaDB", "3.0.9") {
+	library("MariaDB", "3.0.10") {
 		group("org.mariadb.jdbc") {
 			modules = [
 				"mariadb-java-client"
@@ -946,7 +946,7 @@ bom {
 			]
 		}
 	}
-	library("Micrometer", "1.10.2") {
+	library("Micrometer", "1.10.3") {
 		group("io.micrometer") {
 			modules = [
 				"micrometer-registry-stackdriver" {
@@ -958,7 +958,7 @@ bom {
 			]
 		}
 	}
-	library("Micrometer Tracing", "1.0.0") {
+	library("Micrometer Tracing", "1.0.1") {
 		group("io.micrometer") {
 			imports = [
 				"micrometer-tracing-bom"
@@ -984,6 +984,10 @@ bom {
 		}
 	}
 	library("MSSQL JDBC", "11.2.2.jre17") {
+		prohibit {
+			endsWith([".jre8", ".jre11", ".jre18"])
+			because "we use the .jre17 version"
+		}
 		group("com.microsoft.sqlserver") {
 			modules = [
 				"mssql-jdbc"
@@ -1157,7 +1161,7 @@ bom {
 			]
 		}
 	}
-	library("Reactor Bom", "2022.0.1") {
+	library("Reactor Bom", "2022.0.2") {
 		group("io.projectreactor") {
 			imports = [
 				"reactor-bom"
@@ -1332,7 +1336,7 @@ bom {
 			]
 		}
 	}
-	library("Spring AMQP", "3.0.0") {
+	library("Spring AMQP", "3.0.1-SNAPSHOT") {
 		group("org.springframework.amqp") {
 			modules = [
 				"spring-amqp",
@@ -1350,14 +1354,14 @@ bom {
 			]
 		}
 	}
-	library("Spring Data Bom", "2022.0.0") {
+	library("Spring Data Bom", "2022.0.1-SNAPSHOT") {
 		group("org.springframework.data") {
 			imports = [
 				"spring-data-bom"
 			]
 		}
 	}
-	library("Spring Framework", "6.0.3") {
+	library("Spring Framework", "6.0.4") {
 		group("org.springframework") {
 			imports = [
 				"spring-framework-bom"
@@ -1372,21 +1376,21 @@ bom {
 			]
 		}
 	}
-	library("Spring HATEOAS", "2.0.0") {
+	library("Spring HATEOAS", "2.0.1") {
 		group("org.springframework.hateoas") {
 			modules = [
 				"spring-hateoas"
 			]
 		}
 	}
-	library("Spring Integration", "6.0.1") {
+	library("Spring Integration", "6.0.2-SNAPSHOT") {
 		group("org.springframework.integration") {
 			imports = [
 				"spring-integration-bom"
 			]
 		}
 	}
-	library("Spring Kafka", "3.0.1") {
+	library("Spring Kafka", "3.0.2-SNAPSHOT") {
 		group("org.springframework.kafka") {
 			modules = [
 				"spring-kafka",
@@ -1427,20 +1431,20 @@ bom {
 		}
 	}
 	library("Spring Session", "3.0.0") {
+		prohibit {
+			startsWith(["Apple-", "Bean-", "Corn-", "Dragonfruit-"])
+			because "Spring Session switched to numeric version numbers"
+		}
 		group("org.springframework.session") {
 			imports = [
 				"spring-session-bom"
 			]
 		}
 	}
-	library("Spring WS", "4.0.0") {
+	library("Spring WS", "4.0.1-SNAPSHOT") {
 		group("org.springframework.ws") {
-			modules = [
-				"spring-ws-core",
-				"spring-ws-security",
-				"spring-ws-support",
-				"spring-ws-test",
-				"spring-xml"
+			imports = [
+				"spring-ws-bom"
 			]
 		}
 	}
@@ -1504,7 +1508,7 @@ bom {
 			]
 		}
 	}
-	library("Undertow", "2.3.2.Final") {
+	library("Undertow", "2.3.3.Final") {
 		group("io.undertow") {
 			modules = [
 				"undertow-core",
@@ -1541,7 +1545,7 @@ bom {
 			]
 		}
 	}
-	library("XmlUnit2", "2.9.0") {
+	library("XmlUnit2", "2.9.1") {
 		group("org.xmlunit") {
 			modules = [
 				"xmlunit-assertj",
