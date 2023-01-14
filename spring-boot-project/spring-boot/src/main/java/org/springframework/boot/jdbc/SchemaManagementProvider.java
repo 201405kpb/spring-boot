@@ -20,6 +20,8 @@ import javax.sql.DataSource;
 
 /**
  * Strategy interface to determine the {@link SchemaManagement} of a {@link DataSource}.
+ * <p>
+ * 用于确定DataSource的SchemaManagement的策略接口。
  *
  * @author Stephane Nicoll
  * @since 2.0.0
@@ -29,6 +31,8 @@ public interface SchemaManagementProvider {
 
 	/**
 	 * Return the {@link SchemaManagement} for the specified {@link DataSource}.
+	 * 为指定的 DataSource返回SchemaManagement。
+	 *
 	 * @param dataSource the dataSource to handle
 	 * @return the {@link SchemaManagement} for the {@link DataSource}.
 	 */
