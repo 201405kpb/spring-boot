@@ -18,6 +18,7 @@ package org.springframework.boot.jdbc;
 
 /**
  * An enumeration of the available schema management options.
+ * 可用模式管理选项的枚举
  *
  * @author Stephane Nicoll
  * @since 2.0.0
@@ -26,11 +27,13 @@ public enum SchemaManagement {
 
 	/**
 	 * The schema is managed and will be created at the appropriate time.
+	 * 架构已被管理，并将在适当的时间创建。
 	 */
 	MANAGED,
 
 	/**
 	 * The schema is not managed.
+	 * 未管理架构
 	 */
 	UNMANAGED
 
