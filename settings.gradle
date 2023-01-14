@@ -78,9 +78,12 @@ include "spring-boot-system-tests:spring-boot-deployment-tests"
 include "spring-boot-system-tests:spring-boot-image-tests"
 
 file("${rootDir}/spring-boot-project/spring-boot-starters").eachDirMatch(~/spring-boot-starter.*/) {
-	include "spring-boot-project:spring-boot-starters:${it.name}"
+    include "spring-boot-project:spring-boot-starters:${it.name}"
 }
 
 file("${rootDir}/spring-boot-tests/spring-boot-smoke-tests").eachDirMatch(~/spring-boot-smoke-test.*/) {
-	include "spring-boot-tests:spring-boot-smoke-tests:${it.name}"
+    include "spring-boot-tests:spring-boot-smoke-tests:${it.name}"
 }
+
+include 'spring-boot-tests:spring-boot-liquibase'
+
