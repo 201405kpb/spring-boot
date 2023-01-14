@@ -16,17 +16,15 @@
 
 package org.springframework.boot.autoconfigure.liquibase;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
 import org.springframework.beans.factory.annotation.Qualifier;
+
+import java.lang.annotation.*;
 
 /**
  * Qualifier annotation for a DataSource to be injected in to Liquibase. If used for a
  * second data source, the other (main) one would normally be marked as {@code @Primary}.
+ * <p>
+ * 要注入到Liquibase的DataSource的限定符注释。如果用于第二个数据源，另一个主数据源通常会标记为@Primary。
  *
  * @author Eddú Meléndez
  * @since 1.4.1
