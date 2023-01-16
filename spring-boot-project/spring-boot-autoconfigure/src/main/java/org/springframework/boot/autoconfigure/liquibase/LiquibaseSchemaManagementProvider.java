@@ -16,19 +16,19 @@
 
 package org.springframework.boot.autoconfigure.liquibase;
 
-import java.util.stream.StreamSupport;
-
-import javax.sql.DataSource;
-
 import liquibase.integration.spring.SpringLiquibase;
-
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.jdbc.SchemaManagement;
 import org.springframework.boot.jdbc.SchemaManagementProvider;
 
+import javax.sql.DataSource;
+import java.util.stream.StreamSupport;
+
 /**
  * A Liquibase {@link SchemaManagementProvider} that determines if the schema is managed
  * by looking at available {@link SpringLiquibase} instances.
+ * <p>
+ * 一个Liquibase SchemaManagementProvider，它通过查看可用的SpringLiquibase实例来确定是否管理架构。
  *
  * @author Stephane Nicoll
  */

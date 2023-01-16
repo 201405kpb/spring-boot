@@ -16,19 +16,19 @@
 
 package org.springframework.boot.autoconfigure.liquibase;
 
-import java.lang.reflect.Method;
-
-import javax.sql.DataSource;
-
 import liquibase.exception.LiquibaseException;
 import liquibase.integration.spring.SpringLiquibase;
-
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.util.ReflectionUtils;
+
+import javax.sql.DataSource;
+import java.lang.reflect.Method;
 
 /**
  * A custom {@link SpringLiquibase} extension that closes the underlying
  * {@link DataSource} once the database has been migrated.
+ * <p>
+ * 一个自定义的SpringLiquibase扩展，在数据库迁移后关闭基础DataSource。
  *
  * @author Andy Wilkinson
  * @since 2.0.6

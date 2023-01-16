@@ -1503,7 +1503,7 @@ public class SpringApplication {
 			return action.get();
 		}
 		finally {
-			applicationHook.set(null);
+			applicationHook.remove();
 		}
 	}
 

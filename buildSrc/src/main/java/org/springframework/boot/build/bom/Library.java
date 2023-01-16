@@ -104,15 +104,37 @@ public class Library {
 
 		private final VersionRange range;
 
+		private final List<String> startsWith;
+
+		private final List<String> endsWith;
+
+		private final List<String> contains;
+
 		private final String reason;
 
-		public ProhibitedVersion(VersionRange range, String reason) {
+		public ProhibitedVersion(VersionRange range, List<String> startsWith, List<String> endsWith,
+				List<String> contains, String reason) {
 			this.range = range;
+			this.startsWith = startsWith;
+			this.endsWith = endsWith;
+			this.contains = contains;
 			this.reason = reason;
 		}
 
 		public VersionRange getRange() {
 			return this.range;
+		}
+
+		public List<String> getStartsWith() {
+			return this.startsWith;
+		}
+
+		public List<String> getEndsWith() {
+			return this.endsWith;
+		}
+
+		public List<String> getContains() {
+			return this.contains;
 		}
 
 		public String getReason() {

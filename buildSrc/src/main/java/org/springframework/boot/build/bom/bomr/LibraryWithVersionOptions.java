@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2020 the original author or authors.
+ * Copyright 2012-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,29 @@
  * limitations under the License.
  */
 
-package org.springframework.boot.build.cli;
+package org.springframework.boot.build.bom.bomr;
 
-import java.util.Collections;
+import java.util.List;
 
-import org.gradle.api.Task;
-import org.gradle.api.tasks.TaskAction;
+import org.springframework.boot.build.bom.Library;
 
-/**
- * A {@link Task} for creating a Scoop manifest.
- *
- * @author Andy Wilkinson
- */
-public class ScoopManifest extends AbstractPackageManagerDefinitionTask {
+class LibraryWithVersionOptions {
 
-	@TaskAction
-	void createManifest() {
-		String version = getProject().getVersion().toString();
-		createDescriptor(Collections.singletonMap("scoopVersion", version.substring(0, version.lastIndexOf('.'))));
+	private final Library library;
+
+	private final List<VersionOption> versionOptions;
+
+	LibraryWithVersionOptions(Library library, List<VersionOption> versionOptions) {
+		this.library = library;
+		this.versionOptions = versionOptions;
+	}
+
+	Library getLibrary() {
+		return this.library;
+	}
+
+	List<VersionOption> getVersionOptions() {
+		return this.versionOptions;
 	}
 
 }

@@ -30,6 +30,7 @@ import org.springframework.core.type.ClassMetadata;
 
 /**
  * General cache condition used with all cache configuration classes.
+ * 用于所有缓存配置类的常规缓存条件
  *
  * @author Stephane Nicoll
  * @author Phillip Webb

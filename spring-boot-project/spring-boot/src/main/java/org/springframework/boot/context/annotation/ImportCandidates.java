@@ -16,23 +16,20 @@
 
 package org.springframework.boot.context.annotation;
 
+import org.springframework.core.io.UrlResource;
+import org.springframework.util.Assert;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
-
-import org.springframework.core.io.UrlResource;
-import org.springframework.util.Assert;
+import java.util.*;
 
 /**
  * Contains {@code @Configuration} import candidates, usually auto-configurations.
- *
+ * 包含@Configuration导入候选项，通常是自动配置。
+ * <p>
  * The {@link #load(Class, ClassLoader)} method can be used to discover the import
  * candidates.
  *
@@ -60,6 +57,8 @@ public final class ImportCandidates implements Iterable<String> {
 
 	/**
 	 * Returns the list of loaded import candidates.
+	 * 返回加载的导入候选项列表。
+	 *
 	 * @return the list of import candidates
 	 */
 	public List<String> getCandidates() {
@@ -68,6 +67,7 @@ public final class ImportCandidates implements Iterable<String> {
 
 	/**
 	 * Loads the names of import candidates from the classpath.
+	 * 从类路径加载导入候选项的名称。
 	 *
 	 * The names of the import candidates are stored in files named
 	 * {@code META-INF/spring/full-qualified-annotation-name.imports} on the classpath.
