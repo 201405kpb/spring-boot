@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2022 the original author or authors.
+ * Copyright 2012-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
  */
 
 package org.springframework.boot.autoconfigure.web.servlet;
-
-import java.util.function.Supplier;
 
 import jakarta.servlet.DispatcherType;
 import jakarta.servlet.ServletRequest;
@@ -149,17 +147,16 @@ public class ServletWebServerFactoryAutoConfiguration {
 				return;
 			}
 			registerSyntheticBeanIfMissing(registry, "webServerFactoryCustomizerBeanPostProcessor",
-					WebServerFactoryCustomizerBeanPostProcessor.class,
-					WebServerFactoryCustomizerBeanPostProcessor::new);
+					WebServerFactoryCustomizerBeanPostProcessor.class);
 			registerSyntheticBeanIfMissing(registry, "errorPageRegistrarBeanPostProcessor",
-					ErrorPageRegistrarBeanPostProcessor.class, ErrorPageRegistrarBeanPostProcessor::new);
+					ErrorPageRegistrarBeanPostProcessor.class);
 		}
 		// 检查并注册Bean对象
 		private <T> void registerSyntheticBeanIfMissing(BeanDefinitionRegistry registry, String name,
-				Class<T> beanClass, Supplier<T> instanceSupplier) {
+				Class<T> beanClass) {
 			// 检查指定Bean 是否存在，如果不存在则创建Bean 对象并注册
 			if (ObjectUtils.isEmpty(this.beanFactory.getBeanNamesForType(beanClass, true, false))) {
-				RootBeanDefinition beanDefinition = new RootBeanDefinition(beanClass, instanceSupplier);
+				RootBeanDefinition beanDefinition = new RootBeanDefinition(beanClass);
 				beanDefinition.setSynthetic(true);
 				registry.registerBeanDefinition(name, beanDefinition);
 			}

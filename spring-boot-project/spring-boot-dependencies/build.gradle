@@ -9,19 +9,19 @@ description = "Spring Boot Dependencies"
 bom {
 	effectiveBomArtifact()
 	upgrade {
-		policy = "same-minor-version"
+		policy = "same-major-version"
 		gitHub {
 			issueLabels = ["type: dependency-upgrade"]
 		}
 	}
-	library("Angus Mail", "1.0.0") {
+	library("Angus Mail", "1.1.0") {
 		group("org.eclipse.angus") {
 			modules = [
 				"angus-core",
 				"angus-mail",
-				"angus-dsn",
-				"angus-gimap",
-				"angus-imap",
+				"dsn",
+				"gimap",
+				"imap",
 				"jakarta.mail",
 				"logging-mailhandler",
 				"pop3",
@@ -29,7 +29,7 @@ bom {
 			]
 		}
 	}
-	library("Artemis", "2.26.0") {
+	library("Artemis", "2.27.1") {
 		group("org.apache.activemq") {
 			modules = [
 				"artemis-amqp-protocol",
@@ -56,10 +56,10 @@ bom {
 			]
 		}
 	}
-	library("AssertJ", "3.23.1") {
+	library("AssertJ", "3.24.2") {
 		group("org.assertj") {
-			modules = [
-				"assertj-core"
+			imports = [
+				"assertj-bom"
 			]
 		}
 	}
@@ -87,7 +87,7 @@ bom {
 			]
 		}
 	}
-	library("Byte Buddy", "1.12.21") {
+	library("Byte Buddy", "1.12.22") {
 		group("net.bytebuddy") {
 			modules = [
 				"byte-buddy",
@@ -173,7 +173,7 @@ bom {
 			]
 		}
 	}
-	library("Couchbase Client", "3.4.1") {
+	library("Couchbase Client", "3.4.2") {
 		group("com.couchbase.client") {
 			modules = [
 				"java-client"
@@ -256,7 +256,7 @@ bom {
 			]
 		}
 	}
-	library("FreeMarker", "2.3.31") {
+	library("FreeMarker", "2.3.32") {
 		group("org.freemarker") {
 			modules = [
 				"freemarker"
@@ -390,20 +390,6 @@ bom {
 			]
 		}
 	}
-	library("HttpClient", "4.5.14") {
-		group("org.apache.httpcomponents") {
-			modules = [
-				"fluent-hc",
-				"httpclient" {
-					exclude group: "commons-logging", module: "commons-logging"
-				},
-				"httpclient-cache",
-				"httpclient-osgi",
-				"httpclient-win",
-				"httpmime"
-			]
-		}
-	}
 	library("HttpClient5", "5.1.4") {
 		group("org.apache.httpcomponents.client5") {
 			modules = [
@@ -431,7 +417,7 @@ bom {
 			]
 		}
 	}
-	library("Infinispan", "14.0.5.Final") {
+	library("Infinispan", "14.0.6.Final") {
 		group("org.infinispan") {
 			imports = [
 				"infinispan-bom"
@@ -658,7 +644,7 @@ bom {
 			]
 		}
 	}
-	library("jOOQ", "3.17.6") {
+	library("jOOQ", "3.17.7") {
 		group("org.jooq") {
 			modules = [
 				"jooq",
@@ -714,7 +700,7 @@ bom {
 			]
 		}
 	}
-	library("Kafka", "3.3.1") {
+	library("Kafka", "3.3.2") {
 		group("org.apache.kafka") {
 			modules = [
 				"connect",
@@ -972,7 +958,7 @@ bom {
 			]
 		}
 	}
-	library("MongoDB", "4.8.1") {
+	library("MongoDB", "4.8.2") {
 		group("org.mongodb") {
 			modules = [
 				"bson",
@@ -983,7 +969,7 @@ bom {
 			]
 		}
 	}
-	library("MSSQL JDBC", "11.2.2.jre17") {
+	library("MSSQL JDBC", "11.2.3.jre17") {
 		prohibit {
 			endsWith([".jre8", ".jre11", ".jre18"])
 			because "we use the .jre17 version"
@@ -994,7 +980,7 @@ bom {
 			]
 		}
 	}
-	library("MySQL", "8.0.31") {
+	library("MySQL", "8.0.32") {
 		group("com.mysql") {
 			modules = [
 				"mysql-connector-j" {
@@ -1031,7 +1017,7 @@ bom {
 			]
 		}
 	}
-	library("Netty", "4.1.86.Final") {
+	library("Netty", "4.1.87.Final") {
 		group("io.netty") {
 			imports = [
 				"netty-bom"
@@ -1182,7 +1168,7 @@ bom {
 			]
 		}
 	}
-	library("RxJava3", "3.1.5") {
+	library("RxJava3", "3.1.6") {
 		group("io.reactivex.rxjava3") {
 			modules = [
 				"rxjava"
@@ -1336,7 +1322,7 @@ bom {
 			]
 		}
 	}
-	library("Spring AMQP", "3.0.1-SNAPSHOT") {
+	library("Spring AMQP", "3.0.1") {
 		group("org.springframework.amqp") {
 			modules = [
 				"spring-amqp",
@@ -1354,7 +1340,7 @@ bom {
 			]
 		}
 	}
-	library("Spring Data Bom", "2022.0.1-SNAPSHOT") {
+	library("Spring Data Bom", "2022.0.1") {
 		group("org.springframework.data") {
 			imports = [
 				"spring-data-bom"
@@ -1383,14 +1369,14 @@ bom {
 			]
 		}
 	}
-	library("Spring Integration", "6.0.2-SNAPSHOT") {
+	library("Spring Integration", "6.0.2") {
 		group("org.springframework.integration") {
 			imports = [
 				"spring-integration-bom"
 			]
 		}
 	}
-	library("Spring Kafka", "3.0.2-SNAPSHOT") {
+	library("Spring Kafka", "3.0.2") {
 		group("org.springframework.kafka") {
 			modules = [
 				"spring-kafka",
@@ -1441,7 +1427,7 @@ bom {
 			]
 		}
 	}
-	library("Spring WS", "4.0.1-SNAPSHOT") {
+	library("Spring WS", "4.0.1") {
 		group("org.springframework.ws") {
 			imports = [
 				"spring-ws-bom"

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2022 the original author or authors.
+ * Copyright 2012-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,27 @@ package smoketest.web.thymeleaf;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.context.annotation.Bean;
+import org.springframework.core.convert.converter.Converter;
 
 @SpringBootApplication
-@EnableCaching
 public class SampleWebUiApplication {
+
+	@Bean
+	public MessageRepository messageRepository() {
+		return new InMemoryMessageRepository();
+	}
+
+	@Bean
+	public Converter<String, Message> messageConverter() {
+		return new Converter<>() {
+			@Override
+			public Message convert(String id) {
+				return messageRepository().findMessage(Long.valueOf(id));
+			}
+		};
+	}
+
 	public static void main(String[] args) {
 		SpringApplication.run(SampleWebUiApplication.class, args);
 	}
