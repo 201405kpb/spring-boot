@@ -45,7 +45,10 @@ import java.util.*;
  * {@link ConfigDataEnvironmentContributors} by wrapping property sources from the Spring
  * {@link Environment} and adding the initial set of locations.
  * <p>
- * The initial locations can be influenced through the {@link #LOCATION_PROPERTY},
+ * 可用于导入和应用ConfigData的ConfigurationEnvironment的包装器。通过包装Spring容器中的属性源并添加初始位置集，
+ * 配置 ConfigDataEnvironmentContributors的初始集合。
+ * <p>
+ * The initial locations can be influenced via the {@link #LOCATION_PROPERTY},
  * {@value #ADDITIONAL_LOCATION_PROPERTY} and {@value #IMPORT_PROPERTY} properties. If no
  * explicit properties are set, the {@link #DEFAULT_SEARCH_LOCATIONS} will be used.
  *
@@ -56,22 +59,26 @@ class ConfigDataEnvironment {
 
 	/**
 	 * Property used override the imported locations.
+	 * 指定配置文件位置
 	 */
 	static final String LOCATION_PROPERTY = "spring.config.location";
 
 	/**
 	 * Property used to provide additional locations to import.
+	 * 指定附加的配置文件位置
 	 */
 	static final String ADDITIONAL_LOCATION_PROPERTY = "spring.config.additional-location";
 
 	/**
 	 * Property used to provide additional locations to import.
+	 * 指定导入的配置文件位置
 	 */
 	static final String IMPORT_PROPERTY = "spring.config.import";
 
 	/**
 	 * Property used to determine what action to take when a
 	 * {@code ConfigDataNotFoundAction} is thrown.
+	 * 指定配置文件未找到对应的操作
 	 * @see ConfigDataNotFoundAction
 	 */
 	static final String ON_NOT_FOUND_PROPERTY = "spring.config.on-not-found";
@@ -132,25 +139,31 @@ class ConfigDataEnvironment {
 	 * {@link Environment} updates.
 	 */
 	ConfigDataEnvironment(DeferredLogFactory logFactory, ConfigurableBootstrapContext bootstrapContext,
-			ConfigurableEnvironment environment, ResourceLoader resourceLoader, Collection<String> additionalProfiles,
-			ConfigDataEnvironmentUpdateListener environmentUpdateListener) {
+						  ConfigurableEnvironment environment, ResourceLoader resourceLoader, Collection<String> additionalProfiles,
+						  ConfigDataEnvironmentUpdateListener environmentUpdateListener) {
+		//绑定当前Environment对象
 		Binder binder = Binder.get(environment);
 		this.logFactory = logFactory;
 		this.logger = logFactory.getLog(getClass());
+		// 从属性spring.config.on-not-found中获取文件找不到的执行逻辑
 		this.notFoundAction = binder.bind(ON_NOT_FOUND_PROPERTY, ConfigDataNotFoundAction.class)
 				.orElse(ConfigDataNotFoundAction.FAIL);
 		this.bootstrapContext = bootstrapContext;
 		this.environment = environment;
+		// 从spring.factories中获取ConfigDataLocationResolver实现
 		this.resolvers = createConfigDataLocationResolvers(logFactory, bootstrapContext, binder, resourceLoader);
 		this.additionalProfiles = additionalProfiles;
+		// 环境变量更新事件
 		this.environmentUpdateListener = (environmentUpdateListener != null) ? environmentUpdateListener
 				: ConfigDataEnvironmentUpdateListener.NONE;
+		// 从spring.factories中获取所有的ConfigDataLoader并用反射进行实例化
 		this.loaders = new ConfigDataLoaders(logFactory, bootstrapContext,
 				SpringFactoriesLoader.forDefaultResourceLocation());
-		// 创建默认的属性值提供器
+		// 创建ConfigDataEnvironmentContributors对象，里面会根据spring.config.import / location等默认定位参数初始化Contributor
 		this.contributors = createContributors(binder);
 	}
 
+	// 创建 ConfigData 位置读取器
 	protected ConfigDataLocationResolvers createConfigDataLocationResolvers(DeferredLogFactory logFactory,
 																			ConfigurableBootstrapContext bootstrapContext, Binder binder, ResourceLoader resourceLoader) {
 		return new ConfigDataLocationResolvers(logFactory, bootstrapContext, binder, resourceLoader,
@@ -168,6 +181,7 @@ class ConfigDataEnvironment {
 		MutablePropertySources propertySources = this.environment.getPropertySources();
 		List<ConfigDataEnvironmentContributor> contributors = new ArrayList<>(propertySources.size() + 10);
 		PropertySource<?> defaultPropertySource = null;
+		//对 propertySources 进行重新排序
 		for (PropertySource<?> propertySource : propertySources) {
 			if (DefaultPropertiesPropertySource.hasMatchingName(propertySource)) {
 				defaultPropertySource = propertySource;
@@ -228,10 +242,11 @@ class ConfigDataEnvironment {
 	 * {@link Environment}.
 	 */
 	void processAndApply() {
+		//  封装ConfigDataImporter对象，里面有解析ConfigDataLocation -> ConfigDataResource 和load ConfigDataResource -> ConfigData之类的操作
 		ConfigDataImporter importer = new ConfigDataImporter(this.logFactory, this.notFoundAction, this.resolvers,
 				this.loaders);
 		registerBootstrapBinder(this.contributors, null, DENY_INACTIVE_BINDING);
-		// 导入 `spring.config.import` 指定的资源
+		//加载和解析ConfigDataLocation -> ConfigDataResource -> ConfigData ,此时还没有导入到Environment中，执行完毕之后应该都是BOUND_IMPORT,且此时绑定了spring.config / spring.profiles相关的配置属性信息
 		ConfigDataEnvironmentContributors contributors = processInitial(this.contributors, importer);
 		// 创立一个配置数据激活上下文对象，如果绑定到了没有active的属性源，则报错
 		// 比方：spring.profiles.active=prod，但绑定了 application-dev.yaml

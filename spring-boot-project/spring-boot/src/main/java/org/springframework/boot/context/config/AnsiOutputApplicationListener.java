@@ -29,6 +29,8 @@ import org.springframework.core.env.ConfigurableEnvironment;
  * An {@link ApplicationListener} that configures {@link AnsiOutput} depending on the
  * value of the property {@code spring.output.ansi.enabled}. See {@link Enabled} for valid
  * values.
+ * 根据spring.output.ansi.enabled参数配置AnsiOutput
+ * 用来设置ANSI的彩色输出，一般是让集成开发工具输出彩色日志，使得信息更具可读性。
  *
  * @author Raphael von der Grün
  * @author Madhura Bhave

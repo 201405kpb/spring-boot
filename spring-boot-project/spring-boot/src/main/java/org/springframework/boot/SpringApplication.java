@@ -439,7 +439,7 @@ public class SpringApplication {
 		/**
 		 * <4> 对所有的 SpringApplicationRunListener 广播 ApplicationEvent 应用环境已准备好的事件，这一步比较复杂
 		 * 例如 Spring Cloud 的 BootstrapApplicationListener 监听到该事件会创建一个 ApplicationContext 作为当前 Spring 应用上下文的父容器，同时会读取 `bootstrap.yml` 文件的信息
-		 * {@link ConfigFileApplicationListener} 监听到该事件然后去解析 `application.yml` 等应用配置文件的配置信息
+		 * {@link ConfigDataEnvironmentPostProcessor} 监听到该事件然后去解析 `application.yml` 等应用配置文件的配置信息
 		 */
 		listeners.environmentPrepared(bootstrapContext, environment);
 		DefaultPropertiesPropertySource.moveToEnd(environment);
@@ -588,10 +588,13 @@ public class SpringApplication {
 	 * @see #configurePropertySources(ConfigurableEnvironment, String[])
 	 */
 	protected void configureEnvironment(ConfigurableEnvironment environment, String[] args) {
+		//如果为 true 则获取并设置转换服务
 		if (this.addConversionService) {
 			environment.setConversionService(new ApplicationConversionService());
 		}
+		// 配置 PropertySources
 		configurePropertySources(environment, args);
+		// 配置 Profiles
 		configureProfiles(environment, args);
 	}
 
@@ -603,12 +606,16 @@ public class SpringApplication {
 	 * @see #configureEnvironment(ConfigurableEnvironment, String[])
 	 */
 	protected void configurePropertySources(ConfigurableEnvironment environment, String[] args) {
+		// 获取环境中的属性资源信息
 		MutablePropertySources sources = environment.getPropertySources();
+		// 如果默认属性配置存在则将其放置在属性资源的最后
 		if (!CollectionUtils.isEmpty(this.defaultProperties)) {
 			DefaultPropertiesPropertySource.addOrMerge(this.defaultProperties, sources);
 		}
+		// 如果命令行属性资源存在
 		if (this.addCommandLineProperties && args.length > 0) {
 			String name = CommandLinePropertySource.COMMAND_LINE_PROPERTY_SOURCE_NAME;
+			// 如果默认资源中不包含该命令，则将命令属性放置在第一位，若包含则通过 CompositePropertySource  处理
 			if (sources.contains(name)) {
 				PropertySource<?> source = sources.get(name);
 				CompositePropertySource composite = new CompositePropertySource(name);
@@ -618,6 +625,7 @@ public class SpringApplication {
 				sources.replace(name, composite);
 			}
 			else {
+				// 放置第一位
 				sources.addFirst(new SimpleCommandLinePropertySource(args));
 			}
 		}

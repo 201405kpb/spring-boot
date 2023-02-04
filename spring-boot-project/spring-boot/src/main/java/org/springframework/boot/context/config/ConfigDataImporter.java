@@ -16,18 +16,11 @@
 
 package org.springframework.boot.context.config;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.logging.Log;
-
 import org.springframework.boot.logging.DeferredLogFactory;
+
+import java.io.IOException;
+import java.util.*;
 
 /**
  * Imports {@link ConfigData} by {@link ConfigDataLocationResolver resolving} and
@@ -81,8 +74,12 @@ class ConfigDataImporter {
 			ConfigDataLocationResolverContext locationResolverContext, ConfigDataLoaderContext loaderContext,
 			List<ConfigDataLocation> locations) {
 		try {
+			//初始化import阶段profile为空
 			Profiles profiles = (activationContext != null) ? activationContext.getProfiles() : null;
+			//使用ConfigDateLocationResolver进行加载和解析
+			// ConfigDataResolutionResult 包含了ConfigDataLocation 和ConfigDataResource(解析结果)
 			List<ConfigDataResolutionResult> resolved = resolve(locationResolverContext, profiles, locations);
+			//使用ConfigDataLoader将ConfigDataResource -> ConfigData -> （PropertySource）
 			return load(loaderContext, resolved);
 		}
 		catch (IOException ex) {
@@ -113,6 +110,7 @@ class ConfigDataImporter {
 	private Map<ConfigDataResolutionResult, ConfigData> load(ConfigDataLoaderContext loaderContext,
 			List<ConfigDataResolutionResult> candidates) throws IOException {
 		Map<ConfigDataResolutionResult, ConfigData> result = new LinkedHashMap<>();
+		//从后向前迭代ConfigDataResolutionResult,倒序
 		for (int i = candidates.size() - 1; i >= 0; i--) {
 			ConfigDataResolutionResult candidate = candidates.get(i);
 			ConfigDataLocation location = candidate.getLocation();
@@ -125,6 +123,7 @@ class ConfigDataImporter {
 			}
 			else {
 				try {
+					//ConfigDataLoader加载将ConfigDataResource -> ConfigData
 					ConfigData loaded = this.loaders.load(loaderContext, resource);
 					if (loaded != null) {
 						this.loaded.add(resource);

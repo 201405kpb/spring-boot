@@ -34,6 +34,8 @@ import java.util.function.Supplier;
 /**
  * A container object which Binds objects from one or more
  * {@link ConfigurationPropertySource ConfigurationPropertySources}.
+ * <p>
+ * 绑定一个或多个 ConfigurationPropertySources 中的对象的容器对象。
  *
  * @author Phillip Webb
  * @author Madhura Bhave
@@ -146,7 +148,7 @@ public class Binder {
 			BindHandler defaultBindHandler, BindConstructorProvider constructorProvider) {
 		this(sources, placeholdersResolver,
 				(conversionService != null) ? Collections.singletonList(conversionService)
-						: (List<ConversionService>) null,
+						: null,
 				propertyEditorInitializer, defaultBindHandler, constructorProvider);
 	}
 
@@ -327,6 +329,7 @@ public class Binder {
 				return handleBindResult(name, target, handler, context, null, create);
 			}
 			target = replacementTarget;
+			//绑定对象
 			Object bound = bindObject(name, target, handler, context, allowRecursiveBinding);
 			return handleBindResult(name, target, handler, context, bound, create);
 		}
@@ -377,6 +380,7 @@ public class Binder {
 
 	private <T> Object bindObject(ConfigurationPropertyName name, Bindable<T> target, BindHandler handler,
 			Context context, boolean allowRecursiveBinding) {
+		//寻找属性
 		ConfigurationProperty property = findProperty(name, target, context);
 		if (property == null && context.depth != 0 && containsNoDescendantOf(context.getSources(), name)) {
 			return null;
@@ -385,8 +389,10 @@ public class Binder {
 		if (aggregateBinder != null) {
 			return bindAggregate(name, target, handler, context, aggregateBinder);
 		}
+		// property 为 null，跳过
 		if (property != null) {
 			try {
+				// 绑定属性
 				return bindProperty(target, context, property);
 			}
 			catch (ConverterNotFoundException ex) {
@@ -398,6 +404,7 @@ public class Binder {
 				throw ex;
 			}
 		}
+		// 在确认确实没有绑定且符合各种条件之后，进入数据绑定
 		return bindDataObject(name, target, handler, context, allowRecursiveBinding);
 	}
 
@@ -427,12 +434,16 @@ public class Binder {
 
 	private <T> ConfigurationProperty findProperty(ConfigurationPropertyName name, Bindable<T> target,
 			Context context) {
+		//类有NO_DIRECT_PROPERTY的限制，无法执行直接返回null; 属性并没有 NO_DIRECT_PROPERTY 的限制,可以执行下面代码。
 		if (name.isEmpty() || target.hasBindRestriction(BindRestriction.NO_DIRECT_PROPERTY)) {
 			return null;
 		}
+		// 遍历资源
 		for (ConfigurationPropertySource source : context.getSources()) {
+			// 获取对应的属性
 			ConfigurationProperty property = source.getConfigurationProperty(name);
 			if (property != null) {
+				// 返回属性
 				return property;
 			}
 		}
@@ -449,9 +460,11 @@ public class Binder {
 
 	private Object bindDataObject(ConfigurationPropertyName name, Bindable<?> target, BindHandler handler,
 			Context context, boolean allowRecursiveBinding) {
+		// 判断这个 bean 到底能不能绑定
 		if (isUnbindableBean(name, target, context)) {
 			return null;
 		}
+		// 解析实际目标类型
 		Class<?> type = target.getType().resolve(Object.class);
 		if (!allowRecursiveBinding && context.isBindingDataObject(type)) {
 			return null;
@@ -470,6 +483,7 @@ public class Binder {
 	}
 
 	private boolean isUnbindableBean(ConfigurationPropertyName name, Bindable<?> target, Context context) {
+		// 在当前上下文中遍历所有的 ConfigurationPropertySource 并找出 符合条件的 source
 		for (ConfigurationPropertySource source : context.getSources()) {
 			if (source.containsDescendantOf(name) == ConfigurationPropertyState.PRESENT) {
 				// We know there are properties to bind so we can't bypass anything
@@ -558,11 +572,14 @@ public class Binder {
 		}
 
 		private <T> T withDataObject(Class<?> type, Supplier<T> supplier) {
+			// 在执行数据绑定之前放我们的 bean 类型进去
 			this.dataObjectBindings.push(type);
 			try {
+				// 执行之前会增加一个 Depth
 				return withIncreasedDepth(supplier);
 			}
 			finally {
+				// 执行完删掉之前保存的bean类型
 				this.dataObjectBindings.pop();
 			}
 		}
@@ -572,11 +589,13 @@ public class Binder {
 		}
 
 		private <T> T withIncreasedDepth(Supplier<T> supplier) {
+			// 执行之前增加一个 Depth
 			increaseDepth();
 			try {
 				return supplier.get();
 			}
 			finally {
+				// 执行结束 减掉一个 Depth
 				decreaseDepth();
 			}
 		}

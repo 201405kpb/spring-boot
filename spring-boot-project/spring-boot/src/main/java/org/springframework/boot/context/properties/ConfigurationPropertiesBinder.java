@@ -62,6 +62,14 @@ class ConfigurationPropertiesBinder {
 	 */
 	private static final String BEAN_NAME = "org.springframework.boot.context.internalConfigurationPropertiesBinder";
 
+	/**
+	 * ConfigurationPropertiesBinderFactory 对象名称
+	 */
+	private static final String FACTORY_BEAN_NAME = "org.springframework.boot.context.internalConfigurationPropertiesBinderFactory";
+
+	/**
+	 * Validator 对象名称
+	 */
 	private static final String VALIDATOR_BEAN_NAME = EnableConfigurationProperties.VALIDATOR_BEAN_NAME;
 
 	private final ApplicationContext applicationContext;
@@ -86,6 +94,7 @@ class ConfigurationPropertiesBinder {
 	BindResult<?> bind(ConfigurationPropertiesBean propertiesBean) {
 		Bindable<?> target = propertiesBean.asBindTarget();
 		ConfigurationProperties annotation = propertiesBean.getAnnotation();
+		// 获取 bindHandler 对象
 		BindHandler bindHandler = getBindHandler(target, annotation);
 		return getBinder().bind(annotation.prefix(), target, bindHandler);
 	}
@@ -105,25 +114,36 @@ class ConfigurationPropertiesBinder {
 	}
 
 	private <T> BindHandler getBindHandler(Bindable<T> target, ConfigurationProperties annotation) {
+		// 获取校验器集合，没有任何的校验器，直接返回空的集合
 		List<Validator> validators = getValidators(target);
+		// 获取handler,实际上是 IgnoreTopLevelConverterNotFoundBindHandler 类型
 		BindHandler handler = getHandler();
+		// 将handler 包装为 ConfigurationPropertiesBindHandler 类型对象
 		handler = new ConfigurationPropertiesBindHandler(handler);
+		//注解属性处理，若属性值绑定到字段，发生错误时，忽略异常，则将handler 包装为 IgnoreErrorsBindHandler 类型对象
 		if (annotation.ignoreInvalidFields()) {
 			handler = new IgnoreErrorsBindHandler(handler);
 		}
+		//注配置项向实体类中的属性绑定时，没有找到对应的字段，不忽略异常，则将handler 包装为 NoUnboundElementsBindHandler 类型对象
 		if (!annotation.ignoreUnknownFields()) {
 			UnboundElementsSourceFilter filter = new UnboundElementsSourceFilter();
 			handler = new NoUnboundElementsBindHandler(handler, filter);
 		}
+		// 若校验器集合不为空，则将 handler 封装为 ValidationBindHandler 类型对象
 		if (!validators.isEmpty()) {
 			handler = new ValidationBindHandler(handler, validators.toArray(new Validator[0]));
 		}
+		// 应用附件功能
 		for (ConfigurationPropertiesBindHandlerAdvisor advisor : getBindHandlerAdvisors()) {
 			handler = advisor.apply(handler);
 		}
+		// 返回对象
 		return handler;
 	}
 
+	/**
+	 * 获取默认的 BindHandler 对象
+	 */
 	private IgnoreTopLevelConverterNotFoundBindHandler getHandler() {
 		BoundConfigurationProperties bound = BoundConfigurationProperties.get(this.applicationContext);
 		return (bound != null)
@@ -131,6 +151,9 @@ class ConfigurationPropertiesBinder {
 				: new IgnoreTopLevelConverterNotFoundBindHandler();
 	}
 
+	/**
+	 * 获取检验器集合
+	 */
 	private List<Validator> getValidators(Bindable<?> target) {
 		List<Validator> validators = new ArrayList<>(3);
 		if (this.configurationPropertiesValidator != null) {
@@ -157,11 +180,17 @@ class ConfigurationPropertiesBinder {
 		return this.jsr303Validator;
 	}
 
+	/**
+	 * 获取spring 容器中 ConfigurationPropertiesBindHandlerAdvisor 类型的对象集合，并将对象集合根据order 进行排序
+	 */
 	private List<ConfigurationPropertiesBindHandlerAdvisor> getBindHandlerAdvisors() {
 		return this.applicationContext.getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class).orderedStream()
 				.toList();
 	}
 
+	/**
+	 * 获取 binder 对象
+	 */
 	private Binder getBinder() {
 		if (this.binder == null) {
 			this.binder = new Binder(getConfigurationPropertySources(), getPropertySourcesPlaceholdersResolver(),
@@ -214,6 +243,7 @@ class ConfigurationPropertiesBinder {
 
 		@Override
 		public <T> Bindable<T> onStart(ConfigurationPropertyName name, Bindable<T> target, BindContext context) {
+			// 这个属性当然没有被 ConfigurationProperties 注解 ，所以没有增加他的限制属性 NO_DIRECT_PROPERTY（！！）
 			return isConfigurationProperties(target.getType().resolve())
 					? target.withBindRestrictions(BindRestriction.NO_DIRECT_PROPERTY) : target;
 		}
