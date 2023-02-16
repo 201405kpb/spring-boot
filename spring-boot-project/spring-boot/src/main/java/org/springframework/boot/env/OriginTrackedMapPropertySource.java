@@ -38,7 +38,9 @@ public final class OriginTrackedMapPropertySource extends MapPropertySource impl
 
 	/**
 	 * Create a new {@link OriginTrackedMapPropertySource} instance.
-	 * @param name the property source name
+	 * 构造函数，创建 OriginTrackedMapPropertySource 对象
+	 *
+	 * @param name   the property source name
 	 * @param source the underlying map source
 	 */
 	@SuppressWarnings("rawtypes")

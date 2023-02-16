@@ -49,6 +49,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * {@link ConfigDataLocationResolver} for standard locations.
+ * 标准的 ConfigData位置解析器
  *
  * @author Madhura Bhave
  * @author Phillip Webb

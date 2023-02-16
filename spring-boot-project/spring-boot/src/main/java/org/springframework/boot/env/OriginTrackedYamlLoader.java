@@ -48,6 +48,8 @@ import org.springframework.core.io.Resource;
 /**
  * Class to load {@code .yml} files into a map of {@code String} to
  * {@link OriginTrackedValue}.
+ * <p>
+ * 将 yml 文件加载到 Map 对象
  *
  * @author Madhura Bhave
  * @author Phillip Webb

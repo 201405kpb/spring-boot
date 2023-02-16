@@ -78,6 +78,7 @@ class ConfigDataEnvironmentContributors implements Iterable<ConfigDataEnvironmen
 	 */
 	ConfigDataEnvironmentContributors withProcessedImports(ConfigDataImporter importer,
 			ConfigDataActivationContext activationContext) {
+		// 获取Import阶段，分导入前导入后
 		ImportPhase importPhase = ImportPhase.get(activationContext);
 		this.logger.trace(LogMessage.format("Processing imports for phase %s. %s", importPhase,
 				(activationContext != null) ? activationContext : "no activation context"));
@@ -95,6 +96,7 @@ class ConfigDataEnvironmentContributors implements Iterable<ConfigDataEnvironmen
 			if (contributor.getKind() == Kind.UNBOUND_IMPORT) {
 				// 生成一个新的ConfigDataEnvironmentContributor
 				ConfigDataEnvironmentContributor bound = contributor.withBoundProperties(result, activationContext);
+				// 绑定ConfigDataProperties 并进行替换
 				result = new ConfigDataEnvironmentContributors(this.logger, this.bootstrapContext,
 						result.getRoot().withReplacement(contributor, bound));
 				continue;

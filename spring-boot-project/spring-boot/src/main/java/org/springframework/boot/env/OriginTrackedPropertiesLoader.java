@@ -38,6 +38,7 @@ import org.springframework.util.Assert;
  * Class to load {@code .properties} files into a map of {@code String} -&gt;
  * {@link OriginTrackedValue}. Also supports expansion of {@code name[]=a,b,c} list style
  * values.
+ * 将 properties 文件加载到 Map 对象
  *
  * @author Madhura Bhave
  * @author Phillip Webb
