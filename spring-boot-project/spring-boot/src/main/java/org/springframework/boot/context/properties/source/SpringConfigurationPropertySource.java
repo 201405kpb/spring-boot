@@ -16,9 +16,6 @@
 
 package org.springframework.boot.context.properties.source;
 
-import java.util.Map;
-import java.util.Random;
-
 import org.springframework.boot.context.properties.source.ConfigurationPropertyName.Form;
 import org.springframework.boot.origin.Origin;
 import org.springframework.boot.origin.PropertySourceOrigin;
@@ -27,6 +24,9 @@ import org.springframework.core.env.PropertySource;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.core.env.SystemEnvironmentPropertySource;
 import org.springframework.util.Assert;
+
+import java.util.Map;
+import java.util.Random;
 
 /**
  * {@link ConfigurationPropertySource} backed by a non-enumerable Spring
@@ -78,12 +78,16 @@ class SpringConfigurationPropertySource implements ConfigurationPropertySource {
 		if (name == null) {
 			return null;
 		}
+		// 遍历 PropertyMapper ：用于提供PropertySource和ConfigurationPropertySource之间映射的策略
 		for (PropertyMapper mapper : this.mappers) {
 			try {
 				for (String candidate : mapper.map(name)) {
+					// 真正获取到的配置文件属性的数据
 					Object value = getPropertySource().getProperty(candidate);
 					if (value != null) {
+						// 获取属性位置信息，比如 class path resource [application.yml] 中的第 2 行 第7 个字段
 						Origin origin = PropertySourceOrigin.get(this.propertySource, candidate);
+						// 返回之前做个判空，然后再返回
 						return ConfigurationProperty.of(this, name, value, origin);
 					}
 				}

@@ -16,29 +16,25 @@
 
 package org.springframework.boot.context.config;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Consumer;
-
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySource;
 import org.springframework.util.Assert;
+
+import java.util.*;
+import java.util.function.Consumer;
 
 /**
  * Configuration data that has been loaded from a {@link ConfigDataResource} and may
  * ultimately contribute {@link PropertySource property sources} to Spring's
  * {@link Environment}.
+ * <p>
+ * 已从 ConfigDataResource 加载的配置数据，最终将属性源添加到Spring 容器的Environment中。
  *
  * @author Phillip Webb
  * @author Madhura Bhave
- * @since 2.4.0
  * @see ConfigDataLocationResolver
  * @see ConfigDataLoader
+ * @since 2.4.0
  */
 public final class ConfigData {
 
@@ -48,6 +44,7 @@ public final class ConfigData {
 
 	/**
 	 * A {@link ConfigData} instance that contains no data.
+	 * 空的 ConfigData 实例
 	 */
 	public static final ConfigData EMPTY = new ConfigData(Collections.emptySet());
 
@@ -149,6 +146,7 @@ public final class ConfigData {
 
 	/**
 	 * {@link PropertySourceOptions} that always returns the same result.
+	 * 始终返回相同结果的 PropertySourceOptions。
 	 */
 	private static class AlwaysPropertySourceOptions implements PropertySourceOptions {
 
@@ -262,16 +260,19 @@ public final class ConfigData {
 
 	/**
 	 * Option flags that can be applied.
+	 * 可以应用的选项标志。
 	 */
 	public enum Option {
 
 		/**
 		 * Ignore all imports properties from the source.
+		 * 忽略源中的所有导入属性。
 		 */
 		IGNORE_IMPORTS,
 
 		/**
 		 * Ignore all profile activation and include properties.
+		 * 忽略所有配置文件激活并包括属性。
 		 * @since 2.4.3
 		 */
 		IGNORE_PROFILES,
@@ -279,6 +280,8 @@ public final class ConfigData {
 		/**
 		 * Indicates that the source is "profile specific" and should be included after
 		 * profile specific sibling imports.
+		 * 指示源是“特定于配置文件”的，并且应包含在特定于配置的同级导入之后。
+		 *
 		 * @since 2.4.5
 		 */
 		PROFILE_SPECIFIC;

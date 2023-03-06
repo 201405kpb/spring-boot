@@ -66,18 +66,26 @@ class ConfigDataLocationResolvers {
 		this.resolvers = reorder(springFactoriesLoader.load(ConfigDataLocationResolver.class, argumentResolver));
 	}
 
+	/**
+	 * 重新排序
+	 *
+	 * @param resolvers
+	 * @return
+	 */
 	@SuppressWarnings("rawtypes")
 	private List<ConfigDataLocationResolver<?>> reorder(List<ConfigDataLocationResolver> resolvers) {
+		// 新建重新排序集合
 		List<ConfigDataLocationResolver<?>> reordered = new ArrayList<>(resolvers.size());
 		StandardConfigDataLocationResolver resourceResolver = null;
+		// 变量 resolvers
 		for (ConfigDataLocationResolver<?> resolver : resolvers) {
 			if (resolver instanceof StandardConfigDataLocationResolver configDataLocationResolver) {
 				resourceResolver = configDataLocationResolver;
-			}
-			else {
+			} else {
 				reordered.add(resolver);
 			}
 		}
+		// 若 reordered 不为空，则将resourceResolver  添加至 reordered 集合中
 		if (resourceResolver != null) {
 			reordered.add(resourceResolver);
 		}

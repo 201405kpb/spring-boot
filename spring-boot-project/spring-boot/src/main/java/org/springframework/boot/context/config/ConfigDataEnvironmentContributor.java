@@ -16,22 +16,16 @@
 
 package org.springframework.boot.context.config;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
-
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.boot.context.properties.bind.PlaceholdersResolver;
 import org.springframework.boot.context.properties.source.ConfigurationPropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.PropertySource;
 import org.springframework.util.CollectionUtils;
+
+import java.util.*;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 /**
  * A single element that may directly or indirectly contribute configuration data to the
@@ -442,33 +436,38 @@ class ConfigDataEnvironmentContributor implements Iterable<ConfigDataEnvironment
 
 		/**
 		 * A root contributor used contain the initial set of children.
+		 * 包含了所有的Contributors
 		 */
 		ROOT,
 
 		/**
 		 * An initial import that needs to be processed.
+		 * 需要处理的初始导入
 		 */
 		INITIAL_IMPORT,
 
 		/**
 		 * An existing property source that contributes properties but no imports.
+		 * 提供属性但不导入的现有属性源
 		 */
 		EXISTING,
 
 		/**
-		 * A contributor with {@link ConfigData} imported from another contributor but not
-		 * yet bound.
+		 * A contributor with {@link ConfigData} imported from another contributor but not yet bound.
+		 * 具有ConfigData的贡献者从另一个贡献者导入，但尚未绑定。
 		 */
 		UNBOUND_IMPORT,
 
 		/**
-		 * A contributor with {@link ConfigData} imported from another contributor that
-		 * has been.
+		 * A contributor with {@link ConfigData} imported from another contributor that has been.
+		 * 已经绑定好环境参数阶段
+		 *
 		 */
 		BOUND_IMPORT,
 
 		/**
 		 * A valid location that contained nothing to load.
+		 * 不包含任何要加载的内容的有效位置.
 		 */
 		EMPTY_LOCATION;
 
@@ -476,21 +475,25 @@ class ConfigDataEnvironmentContributor implements Iterable<ConfigDataEnvironment
 
 	/**
 	 * Import phases that can be used when obtaining imports.
+	 * 获取导入时可以使用的导入阶段
 	 */
 	enum ImportPhase {
 
 		/**
 		 * The phase before profiles have been activated.
+		 * 配置文件激活之前的阶段
 		 */
 		BEFORE_PROFILE_ACTIVATION,
 
 		/**
 		 * The phase after profiles have been activated.
+		 * 配置文件激活后的阶段
 		 */
 		AFTER_PROFILE_ACTIVATION;
 
 		/**
 		 * Return the {@link ImportPhase} based on the given activation context.
+		 * 基于给定的激活上下文返回 ImportPhase
 		 * @param activationContext the activation context
 		 * @return the import phase
 		 */
@@ -505,6 +508,7 @@ class ConfigDataEnvironmentContributor implements Iterable<ConfigDataEnvironment
 
 	/**
 	 * Iterator that traverses the contributor tree.
+	 * 遍历贡献者树的迭代器
 	 */
 	private final class ContributorIterator implements Iterator<ConfigDataEnvironmentContributor> {
 

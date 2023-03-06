@@ -16,15 +16,8 @@
 
 package org.springframework.boot.env;
 
-import java.util.OptionalInt;
-import java.util.OptionalLong;
-import java.util.Random;
-import java.util.UUID;
-import java.util.function.Function;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertySource;
@@ -33,6 +26,12 @@ import org.springframework.core.log.LogMessage;
 import org.springframework.util.Assert;
 import org.springframework.util.DigestUtils;
 import org.springframework.util.StringUtils;
+
+import java.util.OptionalInt;
+import java.util.OptionalLong;
+import java.util.Random;
+import java.util.UUID;
+import java.util.function.Function;
 
 /**
  * {@link PropertySource} that returns a random value for any property that starts with
@@ -146,8 +145,11 @@ public class RandomValuePropertySource extends PropertySource<Random> {
 	}
 
 	static void addToEnvironment(ConfigurableEnvironment environment, Log logger) {
+		// 在环境变量中获取 属性资源管理对象
 		MutablePropertySources sources = environment.getPropertySources();
+		// 根据 资源名称 获取属性资源对象
 		PropertySource<?> existing = sources.get(RANDOM_PROPERTY_SOURCE_NAME);
+		// 如果不为null则返回
 		if (existing != null) {
 			logger.trace("RandomValuePropertySource already present");
 			return;

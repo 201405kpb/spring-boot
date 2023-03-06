@@ -16,15 +16,11 @@
 
 package org.springframework.boot.context.properties.source;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+
+import java.util.*;
+import java.util.function.Function;
 
 /**
  * A configuration property name composed of elements separated by dots. User created
@@ -595,6 +591,12 @@ public final class ConfigurationPropertyName implements Comparable<Configuration
 		return elementsOf(name, returnNullIfInvalid, ElementsParser.DEFAULT_CAPACITY);
 	}
 
+	/**
+	 * @param name                源名称
+	 * @param returnNullIfInvalid 如果名称无效则应返回 null
+	 * @param parserCapacity      解析器容量
+	 * @return 指定字符串的ConfigurationPropertyName
+	 */
 	private static Elements elementsOf(CharSequence name, boolean returnNullIfInvalid, int parserCapacity) {
 		if (name == null) {
 			Assert.isTrue(returnNullIfInvalid, "Name must not be null");

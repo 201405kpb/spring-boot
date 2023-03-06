@@ -28,9 +28,6 @@ import org.springframework.beans.factory.BeanNameAware;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 /**
  * Base class for Servlet 3.0+ {@link jakarta.servlet.Registration.Dynamic dynamic} based
  * registration beans.

@@ -76,6 +76,7 @@ public class SpringApplicationJsonEnvironmentPostProcessor implements Environmen
 
 	/**
 	 * The default order for the processor.
+	 * 默认的加载顺序
 	 */
 	public static final int DEFAULT_ORDER = Ordered.HIGHEST_PRECEDENCE + 5;
 
@@ -93,6 +94,7 @@ public class SpringApplicationJsonEnvironmentPostProcessor implements Environmen
 	@Override
 	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
 		MutablePropertySources propertySources = environment.getPropertySources();
+		//遍历系统中的PropertySource，构建 JsonPropertyValue 对象，将JsonPropertyValue 转换成Map 对象并添加至环境变量中
 		propertySources.stream()
 			.map(JsonPropertyValue::get)
 			.filter(Objects::nonNull)
